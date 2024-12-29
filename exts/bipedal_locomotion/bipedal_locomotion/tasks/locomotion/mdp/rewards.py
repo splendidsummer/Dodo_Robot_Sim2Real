@@ -6,13 +6,13 @@ specify the reward function and its parameters.
 
 from __future__ import annotations
 
+import numpy as np
 import torch
 from torch import distributions
-import numpy as np
 from typing import TYPE_CHECKING, Optional
 
 from omni.isaac.lab.assets import Articulation, RigidObject
-from omni.isaac.lab.managers import SceneEntityCfg, ManagerTermBase
+from omni.isaac.lab.managers import ManagerTermBase, SceneEntityCfg
 from omni.isaac.lab.sensors import ContactSensor, RayCaster
 
 if TYPE_CHECKING:
@@ -64,9 +64,11 @@ def unbalance_feet_height(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg) ->
     return height_variance
 
 
-def feet_distance(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+def feet_distance(
+    env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+) -> torch.Tensor:
     """Penalize if the distance between feet is below a minimum threshold."""
-    
+
     asset: Articulation = env.scene[asset_cfg.name]
 
     feet_positions = asset.data.joint_pos[sensor_cfg.body_ids]
@@ -76,7 +78,7 @@ def feet_distance(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, asset_cfg:
 
     # feet distance on x-y plane
     feet_distance = torch.norm(feet_positions[0, :2] - feet_positions[1, :2], dim=-1)
-    
+
     return torch.clamp(0.1 - feet_distance, min=0.0)
 
 
@@ -96,31 +98,39 @@ def no_contact(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg) -> torch.Tens
 
     return (torch.sum(contacts.float(), dim=1) == 0).float()
 
-def stand_still(env, lin_threshold: float = 0.05, ang_threshold: float = 0.05, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+
+def stand_still(
+    env, lin_threshold: float = 0.05, ang_threshold: float = 0.05, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")
+) -> torch.Tensor:
     """
     penalizing linear and angular motion when command velocities are near zero.
     """
-    
+
     asset = env.scene[asset_cfg.name]
-    base_lin_vel = asset.data.root_lin_vel_w[:, :2]  
-    base_ang_vel = asset.data.root_ang_vel_w[:, -1]  
+    base_lin_vel = asset.data.root_lin_vel_w[:, :2]
+    base_ang_vel = asset.data.root_ang_vel_w[:, -1]
 
     commands = env.command_manager.get_command("base_velocity")
 
-    lin_commands = commands[:, :2] 
-    ang_commands = commands[:, 2]  
+    lin_commands = commands[:, :2]
+    ang_commands = commands[:, 2]
 
     reward_lin = torch.sum(
-        torch.abs(base_lin_vel) * (torch.norm(lin_commands, dim=1, keepdim=True) < lin_threshold),
-        dim=-1
+        torch.abs(base_lin_vel) * (torch.norm(lin_commands, dim=1, keepdim=True) < lin_threshold), dim=-1
     )
- 
+
     reward_ang = torch.abs(base_ang_vel) * (torch.abs(ang_commands) < ang_threshold)
 
     total_reward = reward_lin + reward_ang
     return total_reward
 
-def feet_regulation(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"), desired_body_height: float = 0.65) -> torch.Tensor:
+
+def feet_regulation(
+    env: ManagerBasedRLEnv,
+    sensor_cfg: SceneEntityCfg,
+    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
+    desired_body_height: float = 0.65,
+) -> torch.Tensor:
     """Penalize if the feet are not in contact with the ground.
 
     Args:
@@ -133,25 +143,29 @@ def feet_regulation(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, asset_cf
     """
 
     asset: Articulation = env.scene[asset_cfg.name]
-    
+
     feet_positions_z = asset.data.joint_pos[sensor_cfg.body_ids, 2]
 
     feet_vel_xy = asset.data.joint_vel[sensor_cfg.body_ids, :2]
 
-    vel_norms_xy = torch.norm(feet_vel_xy, dim=-1)  
+    vel_norms_xy = torch.norm(feet_vel_xy, dim=-1)
 
-    exp_term = torch.exp(-feet_positions_z / (0.025 * desired_body_height))  
+    exp_term = torch.exp(-feet_positions_z / (0.025 * desired_body_height))
 
-    r_fr = torch.sum(vel_norms_xy**2 * exp_term, dim=-1) 
+    r_fr = torch.sum(vel_norms_xy**2 * exp_term, dim=-1)
 
     return r_fr
 
+
 def action_smoothness(env: ManagerBasedRLEnv) -> torch.Tensor:
-    '''Penalize the action smoothness'''
+    """Penalize the action smoothness"""
     return torch.sum(
-        torch.square(env.action_manager.action - 2 * env.action_manager.prev_action - env.action_manager.prev_prev_action),
-        dim=1  # Sum over the action dimension
+        torch.square(
+            env.action_manager.action - 2 * env.action_manager.prev_action - env.action_manager.prev_prev_action
+        ),
+        dim=1,  # Sum over the action dimension
     )
+
 
 class GaitReward(ManagerTermBase):
     def __init__(self, cfg: RewardTermCfg, env: ManagerBasedRLEnv):
@@ -287,7 +301,8 @@ class GaitReward(ManagerTermBase):
                 reward += desired_contacts[:, i] * torch.exp(-velocities[:, i] ** 2 / self.vel_sigma)
 
         return (reward / velocities.shape[1]) * self.vel_scale
-    
+
+
 class ActionSmoothnessPenalty(ManagerTermBase):
     """
     A reward term for penalizing large instantaneous changes in the network action output.

@@ -92,3 +92,28 @@ gym.register(
         "rsl_rl_cfg_entry_point": pf_blind_stairs_runner_cfg,
     },
 )
+
+
+#############################
+# PF Blind Rough Environment v1
+#############################
+
+gym.register(
+    id="Isaac-PF-Blind-Rough-v1",
+    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": pointfoot_env_cfg.PFBlindRoughEnvCfgv1,
+        "rsl_rl_cfg_entry_point": pf_blind_rough_runner_cfg,
+    },
+)
+
+gym.register(
+    id="Isaac-PF-Blind-Rough-Play-v1",
+    entry_point="omni.isaac.lab.envs:ManagerBasedRLEnv",
+    disable_env_checker=True,
+    kwargs={
+        "env_cfg_entry_point": pointfoot_env_cfg.PFBlindRoughEnvCfgv1_PLAY,
+        "rsl_rl_cfg_entry_point": pf_blind_rough_runner_cfg,
+    },
+)

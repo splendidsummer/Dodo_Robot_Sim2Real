@@ -1,6 +1,8 @@
 import math
 from dataclasses import MISSING
 
+from pointfoot.tasks.locomotion import mdp
+
 from omni.isaac.lab.assets import ArticulationCfg, AssetBaseCfg
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab.managers import CurriculumTermCfg as CurrTerm
@@ -8,7 +10,6 @@ from omni.isaac.lab.managers import EventTermCfg as EventTerm
 from omni.isaac.lab.managers import ObservationGroupCfg as ObsGroup
 from omni.isaac.lab.managers import ObservationTermCfg as ObsTerm
 from omni.isaac.lab.managers import RewardTermCfg as RewTerm
-from omni.isaac.lab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import CommandsCfg as BaseCommandsCfg
 from omni.isaac.lab.managers import SceneEntityCfg
 from omni.isaac.lab.managers import TerminationTermCfg as DoneTerm
 from omni.isaac.lab.scene import InteractiveSceneCfg
@@ -19,8 +20,7 @@ from omni.isaac.lab.utils import configclass
 from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
 from omni.isaac.lab.utils.noise import AdditiveGaussianNoiseCfg as GaussianNoise
 from omni.isaac.lab.utils.noise import AdditiveUniformNoiseCfg as UniformNoise
-
-from pointfoot.tasks.locomotion import mdp
+from omni.isaac.lab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import CommandsCfg as BaseCommandsCfg
 
 ##################
 # Scene Definition
@@ -99,20 +99,18 @@ class TestCommandCfg(BaseCommandsCfg):
             durations=(0.5, 0.5),  # Contact duration range [0-1]
         ),
     )
-    
+
     def __post_init__(self):
         self.base_velocity.asset_name = "robot"
         self.base_velocity.heading_command = True
-        self.base_velocity.debug_vis=True
+        self.base_velocity.debug_vis = True
         self.base_velocity.heading_control_stiffness = 1.0
         self.base_velocity.resampling_time_range = (0.0, 5.0)
         self.base_velocity.rel_standing_envs = 0.2
-        self.base_velocity.rel_heading_envs=0.0
-        self.base_velocity.ranges=mdp.UniformVelocityCommandCfg.Ranges(
+        self.base_velocity.rel_heading_envs = 0.0
+        self.base_velocity.ranges = mdp.UniformVelocityCommandCfg.Ranges(
             lin_vel_x=(-1.0, 1.0), lin_vel_y=(-0.5, 0.5), ang_vel_z=(-1, 1), heading=(-math.pi, math.pi)
         )
-
-        
 
 
 @configclass
@@ -141,7 +139,7 @@ class TestObservarionsCfg:
         proj_gravity = ObsTerm(func=mdp.projected_gravity, noise=UniformNoise(operation="add", n_min=-0.05, n_max=0.05))
 
         # robot joint measurements
-        joint_pos = ObsTerm(func=mdp.joint_pos_rel, noise=UniformNoise(operation="add", n_min = -0.01, n_max=0.01))
+        joint_pos = ObsTerm(func=mdp.joint_pos_rel, noise=UniformNoise(operation="add", n_min=-0.01, n_max=0.01))
         joint_vel = ObsTerm(func=mdp.joint_vel, noise=UniformNoise(operation="add", n_min=-1.5, n_max=1.5))
 
         # last action
@@ -159,17 +157,19 @@ class TestObservarionsCfg:
         # gaits
         gait_phase = ObsTerm(func=mdp.get_gait_phase)
         gait_command = ObsTerm(func=mdp.get_gait_command, params={"command_name": "gait_command"})
-        
+
         def __post_init__(self):
             self.enable_corruption = True
             self.concatenate_terms = True
+            self.history_length = 5
+            self.flatten_history_dim = True
 
     @configclass
     class CriticCfg(ObsGroup):
         """Observation for critic group"""
 
-        # Policy observation 
-        
+        # Policy observation
+
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         proj_gravity = ObsTerm(func=mdp.projected_gravity, noise=GaussianNoise(mean=0.0, std=0.025))
 
@@ -179,7 +179,7 @@ class TestObservarionsCfg:
         last_action = ObsTerm(func=mdp.last_action)
 
         vel_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
-        
+
         gait_phase = ObsTerm(func=mdp.get_gait_phase)
         gait_command = ObsTerm(func=mdp.get_gait_command, params={"command_name": "gait_command"})
 
@@ -187,12 +187,13 @@ class TestObservarionsCfg:
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
         robot_joint_torque = ObsTerm(func=mdp.robot_joint_torque)
         robot_joint_acc = ObsTerm(func=mdp.robot_joint_acc)
-        robot_feet_contact_force = ObsTerm(func=mdp.robot_feet_contact_force,
+        robot_feet_contact_force = ObsTerm(
+            func=mdp.robot_feet_contact_force,
             params={
                 "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*foot_[LR]_Link"),
-            }
+            },
         )
-        
+
         robot_mass = ObsTerm(func=mdp.robot_mass)
         robot_inertia = ObsTerm(func=mdp.robot_inertia)
         robot_joint_stiffness = ObsTerm(func=mdp.robot_joint_stiffness)
@@ -205,7 +206,9 @@ class TestObservarionsCfg:
         def __post_init__(self):
             self.enable_corruption = True
             self.concatenate_terms = True
-            
+            self.history_length = 5
+            self.flatten_history_dim = True
+
     policy: PolicyCfg = PolicyCfg()
     critic: CriticCfg = CriticCfg()
 
@@ -258,7 +261,6 @@ class EventsCfg:
         },
         is_global_time=False,
         min_step_count_between_reset=0,
-        
     )
     robot_joint_stiffness_and_damping = EventTerm(
         func=mdp.randomize_actuator_gains,
@@ -283,7 +285,7 @@ class EventsCfg:
             "distribution": "uniform",
         },
     )
-    
+
     # reset
     reset_robot_base = EventTerm(
         func=mdp.reset_root_state_uniform,
@@ -313,7 +315,7 @@ class EventsCfg:
         is_global_time=False,
         min_step_count_between_reset=0,
     )
-        
+
     # interval
     # push_robot = EventTerm(
     #     func=mdp.push_by_setting_velocity,
@@ -339,6 +341,7 @@ class EventsCfg:
         min_step_count_between_reset=0,
     )
 
+
 @configclass
 class TestRewardsCfg:
     """Reward terms for the MDP"""
@@ -363,7 +366,10 @@ class TestRewardsCfg:
     pen_undesired_contacts = RewTerm(
         func=mdp.undesired_contacts,
         weight=-0.5,
-        params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names = ["abad_.*", "hip_.*", "knee_.*", "base_Link"]),"threshold": 10.0},
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["abad_.*", "hip_.*", "knee_.*", "base_Link"]),
+            "threshold": 10.0,
+        },
     )
     pen_lin_vel_z = RewTerm(func=mdp.lin_vel_z_l2, weight=-0.5)
     pen_ang_vel_xy = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
@@ -373,13 +379,16 @@ class TestRewardsCfg:
     pen_joint_vel_l2 = RewTerm(func=mdp.joint_vel_l2, weight=-5.0e-05)
     pen_joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-07)
     pen_joint_powers = RewTerm(func=mdp.joint_powers_l1, weight=-2.0e-05)
-    pen_base_height = RewTerm(func=mdp.base_height_l2,
-                              params={"target_height": 0.6,},
-                              weight=-2.0)
+    pen_base_height = RewTerm(
+        func=mdp.base_height_l2,
+        params={
+            "target_height": 0.6,
+        },
+        weight=-2.0,
+    )
     pen_joint_torque = RewTerm(func=mdp.joint_torques_l2, weight=-2.0e-05)
     pen_joint_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=-1.0)
 
-    
     # Gait reward
     test_gait_reward = RewTerm(
         func=mdp.GaitReward,
@@ -395,7 +404,6 @@ class TestRewardsCfg:
             "asset_cfg": SceneEntityCfg("robot", body_names="foot_.*"),
         },
     )
-    
 
 
 @configclass

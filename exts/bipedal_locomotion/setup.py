@@ -31,7 +31,7 @@ INSTALL_REQUIRES = [
 PYTORCH_INDEX_URL = ["https://download.pytorch.org/whl/cu118"]
 
 current_dir = os.path.dirname(os.path.abspath(__file__))
-rsl_rl_path = os.path.join(current_dir, '..', 'rsl_rl')
+rsl_rl_path = os.path.join(current_dir, "..", "rsl_rl")
 
 # Extra dependencies for RL agents
 EXTRAS_REQUIRE = {

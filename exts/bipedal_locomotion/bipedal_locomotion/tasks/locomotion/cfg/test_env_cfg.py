@@ -153,7 +153,7 @@ class ObservarionsCfg:
     class CriticCfg(ObsGroup):
         """Observation for critic group"""
 
-        # Policy observation 
+        # Policy observation
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         proj_gravity = ObsTerm(func=mdp.projected_gravity, noise=GaussianNoise(mean=0.0, std=0.025))
@@ -174,12 +174,11 @@ class ObservarionsCfg:
         robot_pos = ObsTerm(func=mdp.robot_pos, noise=GaussianNoise(mean=0.0, std=0.01))
         robot_vel = ObsTerm(func=mdp.robot_vel, noise=GaussianNoise(mean=0.0, std=0.01))
         robot_material_propertirs = ObsTerm(func=mdp.robot_material_properties, noise=GaussianNoise(mean=0.0, std=0.01))
-        
 
         def __post_init__(self):
             self.enable_corruption = True
             self.concatenate_terms = True
-            
+
     policy: PolicyCfg = PolicyCfg()
     critic: CriticCfg = CriticCfg()
 
@@ -248,7 +247,7 @@ class EventsCfg:
             "distribution": "uniform",
         },
     )
-    
+
     # reset
     reset_robot_base = EventTerm(
         func=mdp.reset_root_state_uniform,
@@ -274,7 +273,7 @@ class EventsCfg:
             "velocity_range": (0.0, 0.0),
         },
     )
-        
+
     # interval
     # push_robot = EventTerm(
     #     func=mdp.push_by_setting_velocity,
@@ -298,6 +297,7 @@ class EventsCfg:
         },
     )
 
+
 @configclass
 class RewardsCfg:
     """Reward terms for the MDP"""
@@ -316,7 +316,7 @@ class RewardsCfg:
             "sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*foot_[LR]_Link"),
         },
     )
-    
+
     # rew_feet_air_time_positive_biped = RewTerm(
     #     func=mdp.feet_air_time_positive_biped,
     #     weight=5.0,
@@ -344,9 +344,7 @@ class RewardsCfg:
     pen_flat_orientation = RewTerm(func=mdp.flat_orientation_l2, weight=-5.0)
     pen_joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-5e-7)
     pen_joint_powers = RewTerm(func=mdp.joint_powers_l1, weight=-5e-4)
-    pen_base_height = RewTerm(func=mdp.base_height_l2,
-                              params={"target_height": 0.65},
-                              weight=-10.0)
+    pen_base_height = RewTerm(func=mdp.base_height_l2, params={"target_height": 0.65}, weight=-10.0)
     # pen_feet_contact_forces = RewTerm(func=mdp.contact_forces,
     #                                   params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names=".*foot_[LR]_Link"), "threshold": 350.0},
     #                                   weight=-0.01)

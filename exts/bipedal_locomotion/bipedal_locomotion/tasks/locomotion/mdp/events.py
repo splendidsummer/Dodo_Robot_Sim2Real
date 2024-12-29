@@ -2,12 +2,12 @@ from __future__ import annotations
 
 import torch
 from typing import TYPE_CHECKING, Literal
-from omni.isaac.lab.envs import ManagerBasedEnv
-
-from omni.isaac.lab.assets import Articulation, RigidObject
-from omni.isaac.lab.managers import SceneEntityCfg
 
 import omni.isaac.lab.utils.math as math_utils
+from omni.isaac.lab.assets import Articulation, RigidObject
+from omni.isaac.lab.envs import ManagerBasedEnv
+from omni.isaac.lab.managers import SceneEntityCfg
+
 
 def apply_external_force_torque_stochastic(
     env: ManagerBasedEnv,
@@ -56,6 +56,7 @@ def apply_external_force_torque_stochastic(
     # note: these are only applied when you call: `asset.write_data_to_sim()`
     asset.set_external_force_and_torque(forces, torques, env_ids=masked_env_ids, body_ids=asset_cfg.body_ids)
 
+
 def randomize_rigid_body_mass_inertia(
     env: ManagerBasedEnv,
     env_ids: torch.Tensor | None,
@@ -100,7 +101,8 @@ def randomize_rigid_body_mass_inertia(
 
     asset.root_physx_view.set_masses(masses, env_ids)
     asset.root_physx_view.set_inertias(inertias, env_ids)
-    
+
+
 def randomize_rigid_body_coms(
     env: ManagerBasedEnv,
     env_ids: torch.Tensor | None,
@@ -129,11 +131,17 @@ def randomize_rigid_body_coms(
     # Apply randomization to each dimension separately
     for dim in range(3):  # 0=x, 1=y, 2=z
         coms[..., dim] = _randomize_prop_by_op(
-            coms[..., dim], com_distribution_params[dim], env_ids, body_ids, operation=operation, distribution=distribution
+            coms[..., dim],
+            com_distribution_params[dim],
+            env_ids,
+            body_ids,
+            operation=operation,
+            distribution=distribution,
         )
 
     asset.root_physx_view.set_coms(coms, env_ids)
-    
+
+
 """
 Internal helper functions.
 """

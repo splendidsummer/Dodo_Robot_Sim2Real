@@ -50,7 +50,7 @@ To setup the IDE, please follow these instructions:
 
 - Run VSCode Tasks, by pressing `Ctrl+Shift+P`, selecting `Tasks: Run Task` and running the `setup_python_env` in the drop down menu. When running this task, you will be prompted to add the absolute path to your Isaac Sim installation.
 
-If everything executes correctly, it should create a file .python.env in the `.vscode` directory. The file contains the python paths to all the extensions provided by Isaac Sim and Omniverse. This helps in indexing all the python modules for intelligent suggestions while writing code. 
+If everything executes correctly, it should create a file .python.env in the `.vscode` directory. The file contains the python paths to all the extensions provided by Isaac Sim and Omniverse. This helps in indexing all the python modules for intelligent suggestions while writing code.
 
 ## Training the bipedal robot agent
 - Use the `scripts/rsl_rl/train.py` script to train the robot directly, specifying the task:
@@ -95,14 +95,16 @@ python scripts/rsl_rl/play.py --task=Isaac-PF-Blind-Flat-Play-v0 --checkpoint_pa
 </p>
 
 Overview of the learning framework. The policies are trained using PPO within an asymmetric actor-critic framework.
-Agents in both groups share the same critic and policy network, with actions determined by observations and latent representations from either privileged or proprioceptive encoder. The privileged encoder is trained via policy gradient, while the proprioceptive encoder undergoes supervised learning to minimizereconstruction loss.([H. Wang, H. Luo, W. Zhang, and H. Chen (2024)](https://doi.org/10.1109/LRA.2024.3457379))
+Agents in both groups share the same critic and policy network, with actions determined by observations and latent representations from either privileged or proprioceptive encoder. The privileged encoder is trained via policy gradient, while the proprioceptive encoder undergoes supervised learning to minimize reconstruction loss.([H. Wang, H. Luo, W. Zhang, and H. Chen (2024)](https://doi.org/10.1109/LRA.2024.3457379))
+
+Still in progress...
 
 ## Video Demonstration
 
 ### Simulation in Isaac Lab
 - **Pointfoot Blind Flat**:
 
-https://github.com/user-attachments/assets/58acb940-adc3-42c2-a249-a0fd8c1fd52c  
+https://github.com/user-attachments/assets/58acb940-adc3-42c2-a249-a0fd8c1fd52c
 
 - **Pointfoot Blind Rough**:
 
@@ -162,9 +164,9 @@ Special thanks to all the contributors for their hard work and dedication:
 - Haoxiang Luo
 - Junde Guo
 - Bobin Wang
-- Haojia Zhang  
+- Haojia Zhang
 
-Special thanks to [CLEAR Lab](https://github.com/clearlab-sustech) for their technical and financial support during the development of this project.  
+Special thanks to [CLEAR Lab](https://github.com/clearlab-sustech) for their technical and financial support during the development of this project.
 
 <p align="center">
     <img alt="CLEAR Lab Logo" src="./media/CLEAR_LAB_Logo.png">

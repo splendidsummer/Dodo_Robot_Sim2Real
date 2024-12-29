@@ -33,14 +33,13 @@ import gymnasium as gym
 import os
 import torch
 
-from rsl_rl.runners import OnPolicyRunner
-
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, export_policy_as_onnx
 
 # Import extensions to set up environment tasks
 import bipedal_locomotion  # noqa: F401
+from rsl_rl.runners import OnPolicyRunner
 
 
 def main():
