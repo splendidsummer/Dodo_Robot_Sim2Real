@@ -12,7 +12,7 @@ author = "Xiong Hongwei"
 maintainer = "Xiong Hongwei"
 description="Locomotion tasks for bipedal robots in IsaacLab"
 repository = "https://github.com/Andy-xiong6/bipedal_locomotion_isaaclab.git"
-keywords = ["isaaclab", "bipedal", "locomotion", "pointfoot]
+keywords = ["isaaclab", "bipedal", "locomotion", "pointfoot"]
 
 [dependencies]
 "omni.isaac.lab" = {}
