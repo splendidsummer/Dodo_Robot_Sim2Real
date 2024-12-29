@@ -157,16 +157,6 @@ def feet_regulation(
     return r_fr
 
 
-def action_smoothness(env: ManagerBasedRLEnv) -> torch.Tensor:
-    """Penalize the action smoothness"""
-    return torch.sum(
-        torch.square(
-            env.action_manager.action - 2 * env.action_manager.prev_action - env.action_manager.prev_prev_action
-        ),
-        dim=1,  # Sum over the action dimension
-    )
-
-
 class GaitReward(ManagerTermBase):
     def __init__(self, cfg: RewardTermCfg, env: ManagerBasedRLEnv):
         """Initialize the term.
