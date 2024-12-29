@@ -146,32 +146,12 @@ def feet_regulation(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg, asset_cf
 
     return r_fr
 
-def base_height_adjusted(
-    env: ManagerBasedRLEnv,
-    target_height: float,
-    asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
-    sensor_cfg: Optional[SceneEntityCfg] = None,  
-) -> torch.Tensor:
-    """Penalize asset height from its target using L2 squared kernel.
-
-    Note:
-        For flat terrain, target height is in the world frame. For rough terrain, 
-        sensor readings can adjust the target height to account for the terrain.
-    """
-    # extract the used quantities (to enable type-hinting)
-    asset: RigidObject = env.scene[asset_cfg.name]
-    
-    if sensor_cfg is not None:
-        # Use sensor data to adjust the target height in rough terrain
-        sensor: RayCaster = env.scene[sensor_cfg.name]
-        # Assuming the sensor provides height offset in its root_pos_w[:, 2]
-        adjusted_target_height = target_height + sensor.data.pos_w[:, 2]
-    else:
-        # Use the provided target height directly for flat terrain
-        adjusted_target_height = target_height
-    
-    # Compute the L2 squared penalty
-    return torch.square(asset.data.root_pos_w[:, 2] - adjusted_target_height)
+def action_smoothness(env: ManagerBasedRLEnv) -> torch.Tensor:
+    '''Penalize the action smoothness'''
+    return torch.sum(
+        torch.square(env.action_manager.action - 2 * env.action_manager.prev_action - env.action_manager.prev_prev_action),
+        dim=1  # Sum over the action dimension
+    )
 
 class GaitReward(ManagerTermBase):
     def __init__(self, cfg: RewardTermCfg, env: ManagerBasedRLEnv):
@@ -308,3 +288,57 @@ class GaitReward(ManagerTermBase):
 
         return (reward / velocities.shape[1]) * self.vel_scale
     
+class ActionSmoothnessPenalty(ManagerTermBase):
+    """
+    A reward term for penalizing large instantaneous changes in the network action output.
+    This penalty encourages smoother actions over time.
+    """
+
+    def __init__(self, cfg: RewardTermCfg, env: ManagerBasedRLEnv):
+        """Initialize the term.
+
+        Args:
+            cfg: The configuration of the reward term.
+            env: The RL environment instance.
+        """
+        super().__init__(cfg, env)
+        self.dt = env.step_dt
+        self.prev_prev_action = None
+        self.prev_action = None
+        self.__name__ = "action_smoothness_penalty"
+
+    def __call__(self, env: ManagerBasedRLEnv) -> torch.Tensor:
+        """Compute the action smoothness penalty.
+
+        Args:
+            env: The RL environment instance.
+
+        Returns:
+            The penalty value based on the action smoothness.
+        """
+        # Get the current action from the environment's action manager
+        current_action = env.action_manager.action.clone()
+
+        # If this is the first call, initialize the previous actions
+        if self.prev_action is None:
+            self.prev_action = current_action
+            return torch.zeros(current_action.shape[0], device=current_action.device)
+
+        if self.prev_prev_action is None:
+            self.prev_prev_action = self.prev_action
+            self.prev_action = current_action
+            return torch.zeros(current_action.shape[0], device=current_action.device)
+
+        # Compute the smoothness penalty
+        penalty = torch.sum(torch.square(current_action - 2 * self.prev_action + self.prev_prev_action), dim=1)
+
+        # Update the previous actions for the next call
+        self.prev_prev_action = self.prev_action
+        self.prev_action = current_action
+
+        # Apply a condition to ignore penalty during the first few episodes
+        startup_env_mask = env.episode_length_buf < 3
+        penalty[startup_env_mask] = 0
+
+        # Return the penalty scaled by the configured weight
+        return penalty

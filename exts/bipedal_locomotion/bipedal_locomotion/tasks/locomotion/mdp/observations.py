@@ -9,9 +9,29 @@ from omni.isaac.lab.managers import SceneEntityCfg
 from omni.isaac.lab.managers.manager_base import ManagerTermBase
 from omni.isaac.lab.managers.manager_term_cfg import ObservationTermCfg
 from omni.isaac.lab.sensors import Camera, Imu, RayCaster, RayCasterCamera, TiledCamera
+from omni.isaac.lab.sensors import ContactSensor
 
 if TYPE_CHECKING:
     from omni.isaac.lab.envs import ManagerBasedEnv, ManagerBasedRLEnv
+
+def robot_joint_torque(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    """joint torque of the robot"""
+    asset: Articulation = env.scene[asset_cfg.name]
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    return asset.data.applied_torque.to(device)
+
+def robot_joint_acc(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
+    """joint acc of the robot"""
+    asset: Articulation = env.scene[asset_cfg.name]
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    return asset.data.joint_acc.to(device)
+
+def robot_feet_contact_force(env: ManagerBasedRLEnv, sensor_cfg: SceneEntityCfg):
+    """contact force of the robot feet"""
+    contact_sensor: ContactSensor = env.scene.sensors[sensor_cfg.name]
+    device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
+    contact_force_tensor = contact_sensor.data.net_forces_w_history.to(device)
+    return contact_force_tensor.view(contact_force_tensor.shape[0],-1)
 
 def robot_mass(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("robot")) -> torch.Tensor:
     """mass of the robot"""
