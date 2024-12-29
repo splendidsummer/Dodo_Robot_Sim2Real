@@ -30,15 +30,20 @@ INSTALL_REQUIRES = [
 
 PYTORCH_INDEX_URL = ["https://download.pytorch.org/whl/cu118"]
 
+current_dir = os.path.dirname(os.path.abspath(__file__))
+rsl_rl_path = os.path.join(current_dir, '..', 'rsl_rl')
+
 # Extra dependencies for RL agents
 EXTRAS_REQUIRE = {
-    "rsl-rl": ["rsl-rl@git+https://github.com/leggedrobotics/rsl_rl.git"],
+    "rsl-rl": [rsl_rl_path],
 }
+
 # Add the names with hyphens as aliases for convenience
 EXTRAS_REQUIRE["rsl_rl"] = EXTRAS_REQUIRE["rsl-rl"]
 
 # Cumulation of all extra-requires
 EXTRAS_REQUIRE["all"] = list(itertools.chain.from_iterable(EXTRAS_REQUIRE.values()))
+
 # Remove duplicates in the all list to avoid double installations
 EXTRAS_REQUIRE["all"] = list(set(EXTRAS_REQUIRE["all"]))
 
