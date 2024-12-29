@@ -4,5 +4,6 @@
 """Implementation of different RL agents."""
 
 from .ppo import PPO
+from .ppo_mlp import PPO_MLP
 
 __all__ = ["PPO"]
