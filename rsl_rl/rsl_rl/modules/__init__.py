@@ -5,6 +5,7 @@
 
 from .actor_critic import ActorCritic
 from .actor_critic_recurrent import ActorCriticRecurrent
+from .mlp_module import MlpModule
 from .normalizer import EmpiricalNormalization
 
 __all__ = ["ActorCritic", "ActorCriticRecurrent"]
