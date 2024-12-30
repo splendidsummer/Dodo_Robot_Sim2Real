@@ -7,4 +7,4 @@
 
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import *
 
-from .rl_mlp_cfg import RslRlOnPolicyRunnerMlpCfg, RslRlPpoAlgorithmMlpCfg, MlpModuleCfg
+from .rl_mlp_cfg import MlpModuleCfg, RslRlOnPolicyRunnerMlpCfg, RslRlPpoAlgorithmMlpCfg

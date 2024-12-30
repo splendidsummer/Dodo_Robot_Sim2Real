@@ -6,4 +6,4 @@
 from .ppo import PPO
 from .ppo_mlp import PPO_MLP
 
-__all__ = ["PPO"]
+__all__ = ["PPO", "PPO_MLP"]
