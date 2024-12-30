@@ -6,4 +6,4 @@
 from .rollout_storage import RolloutStorage
 from .rollout_storage_mlp import RolloutStorageMlp
 
-__all__ = ["RolloutStorage"]
+__all__ = ["RolloutStorage", "RolloutStorageMlp"]

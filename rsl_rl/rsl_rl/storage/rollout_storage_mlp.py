@@ -21,12 +21,11 @@ class RolloutStorageMlp(RolloutStorage):
         num_envs,
         num_transitions_per_env,
         obs_shape,
-        privileged_obs_shape, # privileged_ob_shape = critic_obs_shape + privileged_latent_shape
+        privileged_obs_shape,  # privileged_ob_shape = critic_obs_shape + privileged_latent_shape
         actions_shape,
         device="cpu",
     ):
         super().__init__(num_envs, num_transitions_per_env, obs_shape, privileged_obs_shape, actions_shape, device)
-        
 
     def add_transitions(self, transition: Transition):
         if self.step >= self.num_transitions_per_env:
