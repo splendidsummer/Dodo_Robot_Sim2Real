@@ -35,11 +35,16 @@ import torch
 
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, export_policy_as_onnx
+from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
+    RslRlOnPolicyRunnerMlpCfg,
+    RslRlVecEnvWrapper,
+    export_policy_as_onnx,
+)
 
 # Import extensions to set up environment tasks
 import bipedal_locomotion  # noqa: F401
-from rsl_rl.runners import OnPolicyRunner
+from bipedal_locomotion.tasks.locomotion.agents import RslRlOnPolicyRunnerMlpCfg
+from rsl_rl.runners import OnPolicyRunner, OnPolicyRunnerMlp
 
 
 def main():
@@ -48,7 +53,7 @@ def main():
     env_cfg: ManagerBasedRLEnvCfg = parse_env_cfg(
         task_name=args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs
     )
-    agent_cfg: RslRlOnPolicyRunnerCfg = cli_args.parse_rsl_rl_cfg(args_cli.task, args_cli)
+    agent_cfg: RslRlOnPolicyRunnerMlpCfg = cli_args.parse_rsl_rl_cfg(args_cli.task, args_cli)
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg)
@@ -66,7 +71,10 @@ def main():
 
     # load previously trained model
     print(f"[INFO]: Loading model checkpoint from: {resume_path}")
-    ppo_runner = OnPolicyRunner(env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device)
+    on_policy_runner_class = eval(agent_cfg.runner_type)
+    ppo_runner: OnPolicyRunner | OnPolicyRunnerMlp = on_policy_runner_class(
+        env, agent_cfg.to_dict(), log_dir=None, device=agent_cfg.device
+    )
     ppo_runner.load(resume_path)
 
     # obtain the trained policy for inference
