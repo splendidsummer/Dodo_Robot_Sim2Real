@@ -317,7 +317,7 @@ class OnPolicyRunnerMlp:
             critic_obs_normalizer,
             self.env.num_envs,
             self.env.num_obs,
-            device="cpu",
+            device=self.device,
         )
         return policy
 

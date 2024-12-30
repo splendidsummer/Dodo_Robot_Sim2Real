@@ -81,15 +81,20 @@ def main():
     export_policy_as_onnx(ppo_runner.alg.actor_critic, export_model_dir, filename="policy.onnx")
 
     # reset environment
-    obs, _ = env.get_observations()
+    obs, obs_dict = env.get_observations()
+    critic_obs = obs_dict["observations"]["critic"]
     # simulate environment
     while simulation_app.is_running():
         # run everything in inference mode
         with torch.inference_mode():
             # agent stepping
-            actions = policy(obs)
+            if agent_cfg.runner_type == "OnPolicyRunner":
+                actions = policy(obs)
+            elif agent_cfg.runner_type == "OnPolicyRunnerMlp":
+                actions = policy(obs, critic_obs)
             # env stepping
-            obs, _, _, _ = env.step(actions)
+            obs, _, _, infos = env.step(actions)
+            critic_obs = infos["observations"]["critic"]
 
     # close the simulator
     env.close()
