@@ -35,15 +35,11 @@ import torch
 
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
-    RslRlOnPolicyRunnerMlpCfg,
-    RslRlVecEnvWrapper,
-    export_policy_as_onnx,
-)
+from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper, export_policy_as_onnx
 
 # Import extensions to set up environment tasks
 import bipedal_locomotion  # noqa: F401
-from bipedal_locomotion.tasks.locomotion.agents import RslRlOnPolicyRunnerMlpCfg
+from bipedal_locomotion.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerMlpCfg
 from rsl_rl.runners import OnPolicyRunner, OnPolicyRunnerMlp
 
 

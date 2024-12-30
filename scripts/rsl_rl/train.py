@@ -46,7 +46,7 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, R
 
 # Import extensions to set up environment tasks
 import bipedal_locomotion  # noqa: F401
-from bipedal_locomotion.tasks.locomotion.agents import RslRlOnPolicyRunnerMlpCfg
+from bipedal_locomotion.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerMlpCfg
 from rsl_rl.runners import OnPolicyRunner, OnPolicyRunnerMlp
 
 torch.backends.cuda.matmul.allow_tf32 = True

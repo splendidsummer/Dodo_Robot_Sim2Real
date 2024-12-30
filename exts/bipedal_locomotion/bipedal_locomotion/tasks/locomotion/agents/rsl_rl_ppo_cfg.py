@@ -8,6 +8,7 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
 
 @configclass
 class PointFootPPORunnerCfg(RslRlOnPolicyRunnerCfg):
+    runner_type = "OnPolicyRunner"
     num_steps_per_env = 24
     max_iterations = 3001
     save_interval = 200
@@ -16,8 +17,8 @@ class PointFootPPORunnerCfg(RslRlOnPolicyRunnerCfg):
     policy = RslRlPpoActorCriticCfg(
         class_name="ActorCritic",
         init_noise_std=1.0,
-        actor_hidden_dims=[128, 64, 32],
-        critic_hidden_dims=[128, 64, 32],
+        actor_hidden_dims=[512, 256, 128],
+        critic_hidden_dims=[512, 256, 128],
         activation="elu",
     )
     algorithm = RslRlPpoAlgorithmCfg(
