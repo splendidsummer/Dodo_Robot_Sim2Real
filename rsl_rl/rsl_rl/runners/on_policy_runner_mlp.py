@@ -338,6 +338,7 @@ class OnPolicyRunnerMlp:
     def add_git_repo_to_log(self, repo_file_path):
         self.git_status_repos.append(repo_file_path)
 
+
 class PolicyWrapper:
     def __init__(self, actor, mlp_model, normalizer, critic_normalizer, num_envs, num_obs, device):
         self.actor = actor.to(device)
