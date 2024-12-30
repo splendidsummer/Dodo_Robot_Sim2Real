@@ -14,6 +14,8 @@ class MlpModule(nn.Module):
         privileged_input_dim,
         proprio_input_dim,
         latent_dim,
+        privileged_encoder_hidden_dims=[256, 256],
+        proprio_encoder_hidden_dims=[256, 256],
         activation="elu",
         output_normalize=0,
         orthogonal_init=False,
