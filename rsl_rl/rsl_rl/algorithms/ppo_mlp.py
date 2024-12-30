@@ -125,9 +125,11 @@ class PPO_MLP(PPO):
             self.proprio_latent_batch = self.mlp.proprio_mlp_forward(obs_batch)
             self.privileged_latent_batch = self.mlp.privileged_mlp_forward(critic_obs_batch)
 
-            self.actor_critic.act(torch.cat((obs_batch, self.proprio_latent_batch), dim=0))
+            self.actor_critic.act(torch.cat((obs_batch, self.proprio_latent_batch), dim=-1))
             actions_log_prob_batch = self.actor_critic.get_actions_log_prob(actions_batch)
-            value_batch = self.actor_critic.evaluate(torch.cat((critic_obs_batch, self.privileged_latent_batch), dim=0))
+            value_batch = self.actor_critic.evaluate(
+                torch.cat((critic_obs_batch, self.privileged_latent_batch), dim=-1)
+            )
             mu_batch = self.actor_critic.action_mean
             sigma_batch = self.actor_critic.action_std
             entropy_batch = self.actor_critic.entropy

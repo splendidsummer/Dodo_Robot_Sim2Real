@@ -29,10 +29,6 @@ class RslRlPpoAlgorithmMlpCfg(RslRlPpoAlgorithmCfg):
 class MlpModuleCfg:
     """Configuration for the proprio and privileged networks."""
 
-    privileged_input_dim: int = MISSING
-
-    proprio_input_dim: int = MISSING
-
     latent_dim: int = MISSING
 
     privileged_encoder_hidden_dims: list[int] = MISSING
