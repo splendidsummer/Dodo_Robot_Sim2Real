@@ -7,9 +7,10 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from rsl_rl.algorithms import PPO
 from rsl_rl.modules import ActorCritic, MlpModule
 from rsl_rl.storage import RolloutStorageMlp
-from rsl_rl.algorithms import PPO
+
 
 class PPO_MLP(PPO):
     actor_critic: ActorCritic
@@ -49,29 +50,22 @@ class PPO_MLP(PPO):
             desired_kl,
             device,
         )
-        
+
         self.mlp = mlp_module
-        
+
         self.optimizer = optim.Adam(
             [
                 {"params": self.actor_critic.parameters()},
                 {"params": self.mlp.privileged_mlp.parameters()},
-                {"params": self.mlp.propriate_mlp.parameters()},
+                {"params": self.mlp.proprio_mlp.parameters()},
             ],
             lr=learning_rate,
         )
         self.transition = RolloutStorageMlp.Transition()
-        
 
-    def init_storage(self, num_envs, num_transitions_per_env, 
-                     actor_obs_shape, critic_obs_shape, action_shape):
+    def init_storage(self, num_envs, num_transitions_per_env, actor_obs_shape, critic_obs_shape, action_shape):
         self.storage = RolloutStorageMlp(
-            num_envs, 
-            num_transitions_per_env, 
-            actor_obs_shape, 
-            critic_obs_shape, 
-            action_shape, 
-            self.device
+            num_envs, num_transitions_per_env, actor_obs_shape, critic_obs_shape, action_shape, self.device
         )
 
     def test_mode(self):
@@ -84,13 +78,10 @@ class PPO_MLP(PPO):
 
     def act(self, obs, critic_obs):
         privileged_latent = self.mlp.privileged_mlp_forward(critic_obs)
-        propriate_latent = self.mlp.proprio_mlp_forward(obs)
+        proprio_latent = self.mlp.proprio_mlp_forward(obs)
 
-        
-        if self.actor_critic.is_recurrent:
-            self.transition.hidden_states = self.actor_critic.get_hidden_states()
         # Compute the actions and values
-        self.transition.actions = self.actor_critic.act(torch.cat((obs, propriate_latent), dim=1)).detach()
+        self.transition.actions = self.actor_critic.act(torch.cat((obs, proprio_latent), dim=1)).detach()
         self.transition.values = self.actor_critic.evaluate(torch.cat((critic_obs, privileged_latent), dim=1)).detach()
         self.transition.actions_log_prob = self.actor_critic.get_actions_log_prob(self.transition.actions).detach()
         self.transition.action_mean = self.actor_critic.action_mean.detach()
@@ -114,14 +105,10 @@ class PPO_MLP(PPO):
         self.transition.clear()
         self.actor_critic.reset(dones)
 
-
-    def update(self): #TODO: add a rollout storage for mlp to store the latent states
+    def update(self):
         mean_value_loss = 0
         mean_surrogate_loss = 0
-        if self.actor_critic.is_recurrent:
-            generator = self.storage.reccurent_mini_batch_generator(self.num_mini_batches, self.num_learning_epochs)
-        else:
-            generator = self.storage.mini_batch_generator(self.num_mini_batches, self.num_learning_epochs)
+        generator = self.storage.mini_batch_generator(self.num_mini_batches, self.num_learning_epochs)
         for (
             obs_batch,
             critic_obs_batch,
@@ -135,11 +122,12 @@ class PPO_MLP(PPO):
             hid_states_batch,
             masks_batch,
         ) in generator:
-            self.actor_critic.act(obs_batch, masks=masks_batch, hidden_states=hid_states_batch[0])
+            self.proprio_latent_batch = self.mlp.proprio_mlp_forward(obs_batch)
+            self.privileged_latent_batch = self.mlp.privileged_mlp_forward(critic_obs_batch)
+
+            self.actor_critic.act(torch.cat((obs_batch, self.proprio_latent_batch), dim=0))
             actions_log_prob_batch = self.actor_critic.get_actions_log_prob(actions_batch)
-            value_batch = self.actor_critic.evaluate(
-                critic_obs_batch, masks=masks_batch, hidden_states=hid_states_batch[1]
-            )
+            value_batch = self.actor_critic.evaluate(torch.cat((critic_obs_batch, self.privileged_latent_batch), dim=0))
             mu_batch = self.actor_critic.action_mean
             sigma_batch = self.actor_critic.action_std
             entropy_batch = self.actor_critic.entropy
