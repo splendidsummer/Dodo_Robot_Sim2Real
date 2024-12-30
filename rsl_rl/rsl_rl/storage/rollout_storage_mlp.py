@@ -77,7 +77,26 @@ class RolloutStorageMlp(RolloutStorage):
                 advantages_batch = advantages[batch_idx]
                 old_mu_batch = old_mu[batch_idx]
                 old_sigma_batch = old_sigma[batch_idx]
-                yield obs_batch, critic_observations_batch, actions_batch, target_values_batch, advantages_batch, returns_batch, old_actions_log_prob_batch, old_mu_batch, old_sigma_batch, (
-                    None,
-                    None,
-                ), None
+                yield obs_batch, critic_observations_batch, actions_batch, target_values_batch, advantages_batch, returns_batch, old_actions_log_prob_batch, old_mu_batch, old_sigma_batch
+
+    def mlp_mini_batch_generator(self, num_mini_batches, num_epochs):
+        batch_size = self.num_envs * self.num_transitions_per_env
+        mini_batch_size = batch_size // num_mini_batches
+        indices = torch.randperm(num_mini_batches * mini_batch_size, requires_grad=False, device=self.device)
+
+        observations = self.observations.flatten(0, 1)
+        if self.privileged_observations is not None:
+            critic_observations = self.privileged_observations.flatten(0, 1)
+        else:
+            critic_observations = observations
+
+        for epoch in range(num_epochs):
+            for i in range(num_mini_batches):
+                mlp_start = i * mini_batch_size
+                mlp_end = (i + 1) * mini_batch_size
+                mlp_batch_idx = indices[mlp_start:mlp_end]
+
+                mlp_obs_batch = observations[mlp_batch_idx]  # obs batch
+                mlp_critic_obs_batch = critic_observations[mlp_batch_idx]  # critic_obs batch
+
+                yield mlp_obs_batch, mlp_critic_obs_batch

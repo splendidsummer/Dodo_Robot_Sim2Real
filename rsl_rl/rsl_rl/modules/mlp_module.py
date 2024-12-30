@@ -55,6 +55,16 @@ class MlpModule(nn.Module):
         else:
             return latent
 
+    def privileged_mlp_forward_with_norm(self, input):
+        latent = self.privileged_mlp(input)
+        if self.output_normalize != 0:
+            return (
+                torch.nn.functional.normalize(latent, p=2, dim=-1) * self.output_normalize,
+                latent.norm(dim=-1),
+            )
+        else:
+            return latent, latent.norm(dim=-1)
+
 
 class ResidualBlock(nn.Module):
     def __init__(self, hidden_dim, activation):

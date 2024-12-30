@@ -108,6 +108,11 @@ class PPO_MLP(PPO):
     def update(self):
         mean_value_loss = 0
         mean_surrogate_loss = 0
+        mean_kl = 0
+        mean_reconstruction_loss = 0
+        mean_latent_norm = 0
+        mini_batch_count = 0
+        mlp_mini_batch_count = 0
         generator = self.storage.mini_batch_generator(self.num_mini_batches, self.num_learning_epochs)
         for (
             obs_batch,
@@ -119,8 +124,6 @@ class PPO_MLP(PPO):
             old_actions_log_prob_batch,
             old_mu_batch,
             old_sigma_batch,
-            hid_states_batch,
-            masks_batch,
         ) in generator:
             self.proprio_latent_batch = self.mlp.proprio_mlp_forward(obs_batch)
             self.privileged_latent_batch = self.mlp.privileged_mlp_forward(critic_obs_batch)
@@ -156,6 +159,8 @@ class PPO_MLP(PPO):
 
             # Surrogate loss
             ratio = torch.exp(actions_log_prob_batch - torch.squeeze(old_actions_log_prob_batch))
+            # if mini_batch_count == 0:
+            #     print(ratio.max(), ratio.min())
             surrogate = -torch.squeeze(advantages_batch) * ratio
             surrogate_clipped = -torch.squeeze(advantages_batch) * torch.clamp(
                 ratio, 1.0 - self.clip_param, 1.0 + self.clip_param
@@ -183,10 +188,36 @@ class PPO_MLP(PPO):
 
             mean_value_loss += value_loss.item()
             mean_surrogate_loss += surrogate_loss.item()
+            mean_kl += kl_mean.item()
+            mini_batch_count += 1
+
+        generator = self.storage.mlp_mini_batch_generator(self.num_mini_batches, self.num_learning_epochs)
+        for (
+            mlp_obs_batch,
+            mlp_critic_obs_batch,
+        ) in generator:
+            proprio_latent_batch = self.mlp.proprio_mlp_forward(mlp_obs_batch)
+            privileged_latent_batch, latent_norm = self.mlp.privileged_mlp_forward_with_norm(mlp_critic_obs_batch)
+            reconstruction_loss = (privileged_latent_batch.detach() - proprio_latent_batch).pow(2).mean()
+
+            loss = reconstruction_loss
+
+            # Gradient step
+            self.optimizer.zero_grad()
+            loss.backward()
+            nn.utils.clip_grad_norm_(self.mlp.proprio_mlp.parameters(), self.max_grad_norm)
+            self.optimizer.step()
+
+            mean_reconstruction_loss += reconstruction_loss.item()
+            mean_latent_norm += latent_norm.mean().item()
+            mlp_mini_batch_count += 1
 
         num_updates = self.num_learning_epochs * self.num_mini_batches
         mean_value_loss /= num_updates
         mean_surrogate_loss /= num_updates
+        mean_kl /= num_updates
+        mean_reconstruction_loss /= mlp_mini_batch_count
+        mean_latent_norm /= num_updates
         self.storage.clear()
 
-        return mean_value_loss, mean_surrogate_loss
+        return mean_value_loss, mean_surrogate_loss, mean_kl, mean_reconstruction_loss, mean_latent_norm
