@@ -39,7 +39,7 @@ from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, R
 
 # Import extensions to set up environment tasks
 import bipedal_locomotion  # noqa: F401
-from bipedal_locomotion.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerMlpCfg
+from bipedal_locomotion.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerMlpCfg, export_mlp_encoder_as_onnx
 from rsl_rl.runners import OnPolicyRunner, OnPolicyRunnerMlp
 
 
@@ -79,7 +79,15 @@ def main():
     # export policy to onnx
     export_model_dir = os.path.join(os.path.dirname(resume_path), "exported")
     export_policy_as_onnx(ppo_runner.alg.actor_critic, export_model_dir, filename="policy.onnx")
-
+    export_mlp_encoder_as_onnx(
+        # ppo_runner.obs_normalizer.mean.shape[0],
+        ppo_runner.alg.mlp.proprio_input_dim,
+        ppo_runner.alg.mlp.proprio_mlp,
+        normalizer=ppo_runner.obs_normalizer,
+        latent_normalize=ppo_runner.alg.mlp.output_normalize,
+        path=export_model_dir,
+        filename="encoder.onnx",
+    )
     # reset environment
     obs, obs_dict = env.get_observations()
     critic_obs = obs_dict["observations"]["critic"]

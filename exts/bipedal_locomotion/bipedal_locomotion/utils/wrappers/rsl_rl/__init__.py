@@ -7,4 +7,5 @@
 
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import *
 
+from .exporter import export_mlp_encoder_as_onnx
 from .rl_mlp_cfg import MlpModuleCfg, RslRlOnPolicyRunnerMlpCfg, RslRlPpoAlgorithmMlpCfg
