@@ -1,8 +1,6 @@
 import math
 from dataclasses import MISSING
 
-from pointfoot.tasks.locomotion import mdp
-
 from omni.isaac.lab.assets import ArticulationCfg, AssetBaseCfg
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab.managers import CurriculumTermCfg as CurrTerm
@@ -21,6 +19,8 @@ from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
 from omni.isaac.lab.utils.noise import AdditiveGaussianNoiseCfg as GaussianNoise
 from omni.isaac.lab.utils.noise import AdditiveUniformNoiseCfg as UniformNoise
 from omni.isaac.lab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import CommandsCfg as BaseCommandsCfg
+
+from bipedal_locomotion.tasks.locomotion import mdp
 
 ##################
 # Scene Definition
@@ -374,11 +374,11 @@ class RewardsCfg:
     pen_joint_accel = RewTerm(func=mdp.joint_acc_l2, weight=-2.5e-07)
     pen_joint_powers = RewTerm(func=mdp.joint_powers_l1, weight=-2.0e-05)
     pen_base_height = RewTerm(
-        func=mdp.base_height_l2,
+        func=mdp.base_com_height,
         params={
-            "target_height": 0.6,
+            "target_height": 0.62,
         },
-        weight=-2.0,
+        weight=-1.0,
     )
     pen_joint_torque = RewTerm(func=mdp.joint_torques_l2, weight=-2.0e-05)
     pen_joint_pos_limits = RewTerm(func=mdp.joint_pos_limits, weight=-1.0)

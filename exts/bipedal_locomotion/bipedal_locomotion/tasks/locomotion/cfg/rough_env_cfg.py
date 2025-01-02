@@ -1,8 +1,6 @@
 import math
 from dataclasses import MISSING
 
-from pointfoot.tasks.locomotion import mdp
-
 from omni.isaac.lab.assets import ArticulationCfg, AssetBaseCfg
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab.managers import CurriculumTermCfg as CurrTerm
@@ -21,6 +19,8 @@ from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
 from omni.isaac.lab.utils.noise import AdditiveGaussianNoiseCfg as GaussianNoise
 from omni.isaac.lab.utils.noise import AdditiveUniformNoiseCfg as UniformNoise
 from omni.isaac.lab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import CommandsCfg as BaseCommandsCfg
+
+from bipedal_locomotion.tasks.locomotion import mdp
 
 ##################
 # Scene Definition
