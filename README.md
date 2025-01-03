@@ -85,17 +85,20 @@ python scripts/rsl_rl/play.py --task=Isaac-PF-Blind-Flat-Play-v0 --checkpoint_pa
     * --checkpoint_path: Path to the checkpoint to load
 
 ## Running exported model in mujoco (sim2sim)
-- After playing the model, the policy has already been saved. You can export the policy to mujoco environment and run it in mujoco [@Andy-xiong6/pointfoot-mujoco-sim](https://github.com/Andy-xiong6/pointfoot-mujoco-sim) by using the `rl-deploy-with-python` repo [@Andy-xiong6/rl-deploy-with-python](https://github.com/Andy-xiong6/rl-deploy-with-python).
+- After playing the model, the policy has already been saved. You can export the policy to mujoco environment and run it in mujoco [@Andy-xiong6/pointfoot-mujoco-sim](https://github.com/Andy-xiong6/pointfoot-mujoco-sim) by using the [@Andy-xiong6/rl-deploy-with-python](https://github.com/Andy-xiong6/rl-deploy-with-python).
 
 - Following the instructions to install it properly and replace the `model/pointfoot/{Robot Type}/policy/policy.onnx` by your trained policy.onnx.
 
 ## Running exported model in real robot (sim2real)
 <p align="center">
-    <img alt="Figure2 of CTS" src="./media/Figure2ofCTS.png">
+    <img alt="Figure2 of CTS" src="./media/learning_frame.png">
 </p>
 
-Overview of the learning framework. The policies are trained using PPO within an asymmetric actor-critic framework.
-Agents in both groups share the same critic and policy network, with actions determined by observations and latent representations from either privileged or proprioceptive encoder. The privileged encoder is trained via policy gradient, while the proprioceptive encoder undergoes supervised learning to minimize reconstruction loss.([H. Wang, H. Luo, W. Zhang, and H. Chen (2024)](https://doi.org/10.1109/LRA.2024.3457379))
+**Overview of the learning framework.**
+
+- The policies are trained using PPO within an asymmetric actor-critic framework, with actions determined by observations and latent representations from either privileged or proprioceptive encoder. There are two encoders. The privileged encoder is trained via policy gradient, while the proprioceptive encoder undergoes supervised learning to minimize reconstruction loss. **Inspired by the paper CTS: Concurrent Teacher-Student Reinforcement Learning for Legged Locomotion. ([H. Wang, H. Luo, W. Zhang, and H. Chen (2024)](https://doi.org/10.1109/LRA.2024.3457379))**
+
+- Using the [`rl-deploy-with-python` repo `mlp` branch](https://github.com/Andy-xiong6/rl-deploy-with-python/tree/mlp) to deploy the trained policy to the real robot.
 
 Still in progress...
 
@@ -118,6 +121,11 @@ https://github.com/user-attachments/assets/74074571-f327-42d0-a424-7df8d9e96653
 - **Pointfoot Blind Flat**:
 
 https://github.com/user-attachments/assets/85a7fff1-53cc-446a-a97f-4e1d909134c2
+
+### Deployment in Real Robot
+- **Pointfoot Blind Flat**:
+
+
 
 ## Troubleshooting
 
