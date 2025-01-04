@@ -164,18 +164,10 @@ This project uses the following open-source libraries:
 
 This project is inspired by the work of [H. Wang, H. Luo, W. Zhang, and H. Chen (2024)](https://doi.org/10.1109/LRA.2024.3457379), which laid the groundwork for the idea behind this repository.
 
-This project is part of the **Bipedal Robot Control** project led by Prof. Wei Zhang at **SUSTech** (Southern University of Science and Technology).
-
-Special thanks to all the contributors for their hard work and dedication:
-- Prof. Wei Zhang
+**Contributors:**
 - Hongwei Xiong
 - Haoxiang Luo
 - Junde Guo
 - Bobin Wang
 - Haojia Zhang
 
-Special thanks to [CLEAR Lab](https://github.com/clearlab-sustech) for their technical and financial support during the development of this project.
-
-<p align="center">
-    <img alt="CLEAR Lab Logo" src="./media/CLEAR_LAB_Logo.png">
-</p>
