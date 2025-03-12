@@ -1,0 +1,471 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- This URDF was automatically created by SolidWorks to URDF Exporter! Originally created by Stephen Brawner (brawner@gmail.com) 
+     Commit Version: 1.6.0-4-g7f85cfe  Build Version: 1.6.7995.38578
+     For more information, please see http://wiki.ros.org/sw_urdf_exporter -->
+<robot
+  name="dodo_robot">
+  <link
+    name="base_link">
+    <inertial>
+      <origin
+        xyz="-0.12176 0.056469 0.116"
+        rpy="0 0 0" />
+      <mass
+        value="1.5061" />
+      <inertia
+        ixx="0.0025805"
+        ixy="-3.2467E-05"
+        ixz="1.3104E-06"
+        iyy="0.0050145"
+        iyz="-3.2231E-07"
+        izz="0.0041706" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/base_link_visuals.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/base_link_visuals.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <link
+    name="Left_HIP">
+    <inertial>
+      <origin
+        xyz="-0.0026466 -0.011737 -0.061775"
+        rpy="0 0 0" />
+      <mass
+        value="0.087538" />
+      <inertia
+        ixx="6.8201E-05"
+        ixy="-2.03E-07"
+        ixz="-2.4518E-07"
+        iyy="4.5068E-05"
+        iyz="-9.4509E-06"
+        izz="2.9111E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Left_HIP_visuals.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Left_HIP_visuals.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Left_HIP_AA"
+    type="continuous">
+    <origin
+      xyz="-0.04463 -0.051748 -0.012022"
+      rpy="1.5708 0.11394 1.5708" />
+    <parent
+      link="base_link" />
+    <child
+      link="Left_HIP" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Left_THIGH">
+    <inertial>
+      <origin
+        xyz="0.033704 -2.0834E-05 -0.1097"
+        rpy="0 0 0" />
+      <mass
+        value="0.10378" />
+      <inertia
+        ixx="0.00026813"
+        ixy="-1.1378E-08"
+        ixz="1.2794E-05"
+        iyy="0.00026178"
+        iyz="6.9814E-08"
+        izz="1.6818E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Left_THIGH_visuals.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Left_THIGH_visuals.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Left_THIGH_FE"
+    type="continuous">
+    <origin
+      xyz="0 -0.04009 -0.082259"
+      rpy="-1.819 0 0" />
+    <parent
+      link="Left_HIP" />
+    <child
+      link="Left_THIGH" />
+    <axis
+      xyz="1 0 0" />
+  </joint>
+  <link
+    name="Left_SHIN">
+    <inertial>
+      <origin
+        xyz="0.053841 -2.0803E-05 -0.1097"
+        rpy="0 0 0" />
+      <mass
+        value="0.10378" />
+      <inertia
+        ixx="0.00026813"
+        ixy="-1.1314E-08"
+        ixz="1.2794E-05"
+        iyy="0.00026177"
+        iyz="6.942E-08"
+        izz="1.6811E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Left_SHIN_visuals.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Left_SHIN_visuals.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Left_KNEE_FE"
+    type="continuous">
+    <origin
+      xyz="0.017314 0 -0.2"
+      rpy="0.5911 0 0" />
+    <parent
+      link="Left_THIGH" />
+    <child
+      link="Left_SHIN" />
+    <axis
+      xyz="1 0 0" />
+  </joint>
+  <link
+    name="Left_FOOT_FE">
+    <inertial>
+      <origin
+        xyz="0.0093704 -0.022508 -0.030073"
+        rpy="0 0 0" />
+      <mass
+        value="0.071589" />
+      <inertia
+        ixx="1.774E-05"
+        ixy="1.4257E-06"
+        ixz="-2.8946E-06"
+        iyy="5.4633E-05"
+        iyz="3.3764E-06"
+        izz="5.9326E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Left_FOOT_FE_visuals.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Left_FOOT_FE_visuals.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Left_FOOT_ANKLE"
+    type="continuous">
+    <origin
+      xyz="0.040144 0 -0.2"
+      rpy="1.5708 -0.051177 -1.5708" />
+    <parent
+      link="Left_SHIN" />
+    <child
+      link="Left_FOOT_FE" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Right_HIP">
+    <inertial>
+      <origin
+        xyz="-0.0026476 -0.011738 0.061775"
+        rpy="0 0 0" />
+      <mass
+        value="0.087539" />
+      <inertia
+        ixx="6.8203E-05"
+        ixy="-2.0289E-07"
+        ixz="2.4503E-07"
+        iyy="4.5077E-05"
+        iyz="9.4499E-06"
+        izz="2.9119E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Right_HIP_visuals.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Right_HIP_visuals.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Right_HIP_AA"
+    type="continuous">
+    <origin
+      xyz="-0.04463 -0.18375 -0.012022"
+      rpy="1.5708 0.012959 -1.5708" />
+    <parent
+      link="base_link" />
+    <child
+      link="Right_HIP" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+  <link
+    name="Right_THIGH">
+    <inertial>
+      <origin
+        xyz="0.026247 -2.0681E-05 -0.1097"
+        rpy="0 0 0" />
+      <mass
+        value="0.10378" />
+      <inertia
+        ixx="0.00026813"
+        ixy="-1.1643E-08"
+        ixz="1.2798E-05"
+        iyy="0.00026179"
+        iyz="6.9854E-08"
+        izz="1.6825E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Right_THIGH_visuals.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Right_THIGH_visuals.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Right_THIGH_FE"
+    type="continuous">
+    <origin
+      xyz="0.0074574 -0.04009 0.082259"
+      rpy="-1.629 0 0" />
+    <parent
+      link="Right_HIP" />
+    <child
+      link="Right_THIGH" />
+    <axis
+      xyz="1 0 0" />
+  </joint>
+  <link
+    name="Right_SHIN">
+    <inertial>
+      <origin
+        xyz="0.026247 -2.0621E-05 -0.1097"
+        rpy="0 0 0" />
+      <mass
+        value="0.10378" />
+      <inertia
+        ixx="0.00026813"
+        ixy="-1.1547E-08"
+        ixz="1.2797E-05"
+        iyy="0.00026178"
+        iyz="6.9376E-08"
+        izz="1.6818E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Right_SHIN_visuals.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.75294 0.75294 0.75294 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Right_SHIN_visuals.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Right_SHIN_FE"
+    type="continuous">
+    <origin
+      xyz="0.03745 0 -0.2"
+      rpy="0.05784 0 0" />
+    <parent
+      link="Right_THIGH" />
+    <child
+      link="Right_SHIN" />
+    <axis
+      xyz="1 0 0" />
+  </joint>
+  <link
+    name="Right_FOOT_FE">
+    <inertial>
+      <origin
+        xyz="0.0093694 -0.022508 0.020626"
+        rpy="0 0 0" />
+      <mass
+        value="0.071587" />
+      <inertia
+        ixx="1.774E-05"
+        ixy="1.425E-06"
+        ixz="2.8943E-06"
+        iyy="5.4632E-05"
+        iyz="-3.3764E-06"
+        izz="5.9325E-05" />
+    </inertial>
+    <visual>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Right_FOOT_FE_visuals.obj" />
+      </geometry>
+      <material
+        name="">
+        <color
+          rgba="0.79216 0.81961 0.93333 1" />
+      </material>
+    </visual>
+    <collision>
+      <origin
+        xyz="0 0 0"
+        rpy="0 0 0" />
+      <geometry>
+        <mesh
+          filename="package://meshes/Right_FOOT_FE_visuals.obj" />
+      </geometry>
+    </collision>
+  </link>
+  <joint
+    name="Right_FOOT_ANKLE"
+    type="continuous">
+    <origin
+      xyz="0.021998 0 -0.2"
+      rpy="1.5708 -0.00037978 1.5708" />
+    <parent
+      link="Right_SHIN" />
+    <child
+      link="Right_FOOT_FE" />
+    <axis
+      xyz="0 0 1" />
+  </joint>
+</robot>

@@ -45,8 +45,8 @@ from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper
 
 # Import extensions to set up environment tasks
-import bipedal_locomotion  # noqa: F401
-from bipedal_locomotion.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerMlpCfg
+import dodo_bipedal_locomotion  # noqa: F401
+from dodo_bipedal_locomotion.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerMlpCfg
 from rsl_rl.runners import OnPolicyRunner, OnPolicyRunnerMlp
 
 torch.backends.cuda.matmul.allow_tf32 = True
