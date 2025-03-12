@@ -1,56 +1,62 @@
 <p align="center">
-    <img alt="SUSTech" src="./media/SUSTech_University_Logo.png" height="150">
+    <img alt="SUSTech" src="./media/TUM_mirmi.png" height="80
+    ">
 </p>
 
-# bipedal_locomotion_isaaclab
+# Dodo Robot Isaaclab Sim2Real
 
-[![IsaacSim](https://img.shields.io/badge/IsaacSim-4.2.0-silver.svg)](https://docs.omniverse.nvidia.com/isaacsim/latest/overview.html)
-[![Isaac Lab](https://img.shields.io/badge/IsaacLab-1.2.0-silver)](https://isaac-sim.github.io/IsaacLab)
+[![IsaacSim](https://img.shields.io/badge/IsaacSim-4.2.0-silver.svg)](https://docs.isaacsim.omniverse.nvidia.com/4.2.0/index.html)
+[![Isaac Lab](https://img.shields.io/badge/IsaacLab-1.4.1-silver)](https://isaac-sim.github.io/IsaacLab)
 [![Python](https://img.shields.io/badge/python-3.10-blue.svg)](https://docs.python.org/3/whatsnew/3.10.html)
 [![Linux platform](https://img.shields.io/badge/platform-linux--64-orange.svg)](https://releases.ubuntu.com/20.04/)
 [![Windows platform](https://img.shields.io/badge/platform-windows--64-orange.svg)](https://www.microsoft.com/en-us/)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit&logoColor=white)](https://pre-commit.com/)
 [![License](https://img.shields.io/badge/license-MIT-yellow.svg)](https://opensource.org/license/mit)
 
 ## Overview
+This repository is served as the place to store all the 
+related work, codes, attempts and random ideas for the locomotion task in the real work of our customized Dodo robot build in the Dodo Lab in MIRMI TUM. 
 
-This repository is used to train and simulate bipedal robots, such as [limxdynamics TRON1](https://www.limxdynamics.com/en/tron1).
-With the help of [Isaac Lab](https://github.com/isaac-sim/IsaacLab), we can train the bipedal robots to walk in different environments, such as flat, rough, and stairs.
+In order to build our own robot **Dodo??**, our team member  first designed the robot body in solid work.. then our professionals bought driver control board and motors/actuators only with the specification descripted in \cite{...}.  
 
-**Keywords:** isaaclab, locomotion, bipedal, pointfoot
+To deploy simulation environment, we have to follow the Isaacsim APIs of building scene to convert the robot urdf file into a file of usd format by the Isaacsim urdf importer. 
 
-## Installation
+To train the locomotion policy, we leverage the PPO as our training algorithm with up to 50k simulation environments running in parellel \cite{pic.?} with the help of [Isaac Lab](https://github.com/isaac-sim/IsaacLab). 
+
+
+**Keywords:** Isaaclab, locomotion, bipedal, customized robot, sim-to-real. 
+
+## Local Installation
+
+- Install Isaacsim by following the [installation guide](https://docs.isaacsim.omniverse.nvidia.com/4.2.0/installation/index.html). We recommend using the conda installation as it simplifies calling Python scripts from the terminal.
 
 - Install Isaac Lab by following the [installation guide](https://isaac-sim.github.io/IsaacLab/main/source/setup/installation/index.html). We recommend using the conda installation as it simplifies calling Python scripts from the terminal.
 
 - Clone the repository separately from the Isaac Lab installation (i.e. outside the `IsaacLab` directory):
 
 ```bash
-# Option 1: HTTPS
-git clone https://github.com/Andy-xiong6/bipedal_locomotion_isaaclab.git
-
-# Option 2: SSH
-git clone git@github.com:Andy-xiong6/bipedal_locomotion_isaaclab.git
+git clone https://github.com/splendidsummer/Dodo_Robot_Sim2Real.git
 ```
 
 ```bash
 # Enter the repository
-conda activate isaaclab
-cd bipedal_locomotion_isaaclab
+conda activate your_isaaclab_env
+cd Dodo_Robot_Sim2Real
 ```
 
 - Using a python interpreter that has Isaac Lab installed, install the library
 
 ```bash
-python -m pip install -e exts/bipedal_locomotion
+python -m pip install -e exts/dodo_bipedal_locomotion
 ```
-## Set up IDE (Optional)
+## Set up VSCODE
 
-To setup the IDE, please follow these instructions:
+To setup the VSCODE, please follow these instructions:
 
-- Run VSCode Tasks, by pressing `Ctrl+Shift+P`, selecting `Tasks: Run Task` and running the `setup_python_env` in the drop down menu. When running this task, you will be prompted to add the absolute path to your Isaac Sim installation.
+- Run VSCode Tasks, by pressing `Ctrl+Shift+P`, selecting `Tasks: Run Task` and running the `setup_python_env` in the drop down menu. When running this task, you will be prompted to add the absolute path to your Isaacsim installation if you are not planning to install Isaacsim with pip installation. 
 
-If everything executes correctly, it should create a file .python.env in the `.vscode` directory. The file contains the python paths to all the extensions provided by Isaac Sim and Omniverse. This helps in indexing all the python modules for intelligent suggestions while writing code.
+<!-- If everything executes correctly, it should create a file .python.env in the `.vscode` directory. The file contains the python paths to all the extensions provided by Isaac Sim and Omniverse. This helps in indexing all the python modules for intelligent suggestions while writing code. -->
+
+- Select Python Interpreter, by pressing `Ctrl+Shift+P`, selecting `Python: Select Interpreter` to select your Isaaclab environment. 
 
 ## Training the bipedal robot agent
 - Use the `scripts/rsl_rl/train.py` script to train the robot directly, specifying the task:
@@ -105,22 +111,18 @@ Still in progress...
 ## Video Demonstration
 
 ### Simulation in Isaac Lab
-- **Pointfoot Blind Flat**:
+- **Blind Flat**:
 
 https://github.com/user-attachments/assets/58acb940-adc3-42c2-a249-a0fd8c1fd52c
 
-- **Pointfoot Blind Rough**:
+- **Blind Rough**:
 
 https://github.com/user-attachments/assets/7448ebe3-0107-49d7-81c7-71df0951bd37
 
-- **Pointfoot Blind Stairs**:
+- **Blind Stairs**:
 
 https://github.com/user-attachments/assets/74074571-f327-42d0-a424-7df8d9e96653
 
-### Simulation in Mujoco
-- **Pointfoot Blind Flat**:
-
-https://github.com/user-attachments/assets/85a7fff1-53cc-446a-a97f-4e1d909134c2
 
 ### Deployment in Real Robot
 - **Pointfoot Blind Flat**:
@@ -129,30 +131,15 @@ https://github.com/user-attachments/assets/85a7fff1-53cc-446a-a97f-4e1d909134c2
 
 ## Troubleshooting
 
-### Pylance Missing Indexing of Extensions
+### Problem 1
 
-In some VsCode versions, the indexing of part of the extensions is missing. In this case, add the path to your extension in `.vscode/settings.json` under the key `"python.analysis.extraPaths"`.
 
-```json
-{
-    "python.analysis.extraPaths": [
-        "<path-to-ext-repo>/exts/bipedal_locomotion"
-    ]
-}
-```
+### Problem 2
 
-### Pylance Crash
-
-If you encounter a crash in `pylance`, it is probable that too many files are indexed and you run out of memory.
-A possible solution is to exclude some of omniverse packages that are not used in your project.
-To do so, modify `.vscode/settings.json` and comment out packages under the key `"python.analysis.extraPaths"`
-Some examples of packages that can likely be excluded are:
 
 ```json
+# code example lines 
 "<path-to-isaac-sim>/extscache/omni.anim.*"         // Animation packages
-"<path-to-isaac-sim>/extscache/omni.kit.*"          // Kit UI tools
-"<path-to-isaac-sim>/extscache/omni.graph.*"        // Graph UI tools
-"<path-to-isaac-sim>/extscache/omni.services.*"     // Services tools
 ...
 ```
 
