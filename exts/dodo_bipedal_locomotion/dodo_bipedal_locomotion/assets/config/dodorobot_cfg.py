@@ -1,8 +1,8 @@
 import os
 
 import omni.isaac.lab.sim as sim_utils
-from omni.isaac.lab.actuators import ImplicitActuatorCfg
-from omni.isaac.lab.assets.articulation import ArticulationCfg
+from omni.isaac.lab.actuators import ImplicitActuatorCfg, DelayedPDActuatorCfg
+from omni.isaac.lab.assets.articulation import ArticulationCfg 
 
 current_dir = os.path.dirname(__file__)
 usd_path = os.path.join(current_dir, "../usd/DODO_ROBOT/robot1.usd")
@@ -44,7 +44,7 @@ DODOROBOT_CFG = ArticulationCfg(
     ),
 
     actuators={
-        "legs": ImplicitActuatorCfg(
+        "legs": DelayedPDActuatorCfg(
             joint_names_expr=[
                 "Left_HIP_AA",
                 "Left_THIGH_FE",
@@ -77,7 +77,9 @@ DODOROBOT_CFG = ArticulationCfg(
                 "Right_THIGH_FE": 2.5,
                 "Right_SHIN_FE": 2.5,
                 "Right_FOOT_ANKLE": 2.5,
-            }
+            }, 
+            min_delay=4,  # TODO: modify this value according to the real robot
+            max_delay=10,
 
         ),
     },

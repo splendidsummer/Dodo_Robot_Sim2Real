@@ -148,13 +148,14 @@ https://github.com/user-attachments/assets/74074571-f327-42d0-a424-7df8d9e96653
 This project uses the following open-source libraries:
 - [IsaacLabExtensionTemplate](https://github.com/isaac-sim/IsaacLabExtensionTemplate)
 - [rsl_rl](https://github.com/leggedrobotics/rsl_rl/tree/master)
+- [bipedal_locomotion_isaaclab](https://github.com/Andy-xiong6/bipedal_locomotion_isaaclab.git) 
 
 This project is inspired by the work of [H. Wang, H. Luo, W. Zhang, and H. Chen (2024)](https://doi.org/10.1109/LRA.2024.3457379), which laid the groundwork for the idea behind this repository.
 
 **Contributors:**
-- Hongwei Xiong
-- Haoxiang Luo
-- Junde Guo
-- Bobin Wang
-- Haojia Zhang
+- Shanshan Zhang
+- Dian Yu 
+- Zerui Wang
+- Jiahe Mao
+- ??? Yuan
 
