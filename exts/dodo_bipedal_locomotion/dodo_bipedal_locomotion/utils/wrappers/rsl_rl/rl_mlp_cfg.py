@@ -30,7 +30,8 @@ class MlpModuleCfg:
     """Configuration for the proprio and privileged networks."""
 
     latent_dim: int = MISSING
-
+    # I suppose that the privileged encoder is designed to be a separate network to 
+    # encode the privileged information as the input of critice network.  
     privileged_encoder_hidden_dims: list[int] = MISSING
 
     proprio_encoder_hidden_dims: list[int] = MISSING

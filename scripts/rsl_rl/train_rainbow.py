@@ -16,10 +16,9 @@ parser.add_argument("--video_length", type=int, default=400, help="Length of the
 parser.add_argument("--video_interval", type=int, default=24000, help="Interval between video recordings (in steps).")
 parser.add_argument("--num_envs", type=int, default=None, help="Number of environments to simulate.")
 parser.add_argument("--max_iterations", type=int, default=None, help="Maximum number of iterations to train.")
-parser.add_argument("--save_interval", type=int, default=None, help="The number of iterations between saves")
-parser.add_argument("--task", type=str, default=None, help="Name of the task.")
-parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
+parser.add_argument("--save_interval", type=int, default=None, help="Seed used for the environment")
 parser.add_argument("--checkpoint_path", type=str, default=None, help="Relative path to checkpoint file.")
+# parser.add_argument("--checkpoint_path", type=str, default=None, help="Relative path to checkpoint file.")
 
 # append RSL-RL cli arguments
 cli_args.add_rsl_rl_args(parser)
@@ -41,14 +40,15 @@ from datetime import datetime
 from omni.isaac.lab.envs import ManagerBasedRLEnvCfg
 from omni.isaac.lab.utils.dict import print_dict
 from omni.isaac.lab.utils.io import dump_pickle, dump_yaml
-from omni.isaac.lab_tasks.utils import get_checkpoint_path, parse_env_cfg
-from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerCfg, RslRlVecEnvWrapper
+from omni.isaac.lab_tasks.utils import parse_env_cfg
+from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import RslRlVecEnvWrapper
 
-# Import extensions to set up environment tasks
-import dodo_bipedal_locomotion  # noqa: F401
-from dodo_bipedal_locomotion.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerMlpCfg
-from rsl_rl.runners import OnPolicyRunner, OnPolicyRunnerMlp
+# # Import extensions to set up environment tasks
+# import bipedal_locomotion  # noqa: F401
+# from bipedal_locomotion.utils.wrappers.rsl_rl import RslRlOnPolicyRunnerMlpCfg
+# from rsl_rl.runners import OnPolicyRunner, OnPolicyRunnerMlp
 
+from rainbow_rl import RainbowRunnerCfg, RainbowRunner
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
 torch.backends.cudnn.deterministic = False
@@ -57,49 +57,50 @@ torch.backends.cudnn.benchmark = False
 
 def main():
     """Train with RSL-RL agent."""
-    # parse configuration
+    # parse configuration: PFBlindFlatEnvCfg 
     env_cfg: ManagerBasedRLEnvCfg = parse_env_cfg(
         task_name=args_cli.task, device=args_cli.device, num_envs=args_cli.num_envs
     )
-
     if args_cli.seed is not None: 
         env_cfg.seed = args_cli.seed
-    
-    env_cfg.rewards.rew_lin_vel_xy.weight = 0.0  # 1
-    env_cfg.rewards.rew_ang_vel_z.weight = 0.0  # 2
-    env_cfg.rewards.rew_no_fly.weight = 0.0  # 3
-    env_cfg.rewards.pen_joint_deviation.weight = 0.0  # 4
-    
-    env_cfg.rewards.pen_undesired_contacts.weight = 0.0  # 5
-    env_cfg.rewards.pen_lin_vel_z.weight = 0.0  # 6
-    env_cfg.rewards.pen_ang_vel_xy.weight = 0.0  # 7
-    env_cfg.rewards.pen_action_rate.weight = 0.0  # 8
-    env_cfg.rewards.pen_flat_orientation.weight = 0.0  # 9
 
-    env_cfg.rewards.pen_joint_accel.weight = 0.0  # 10
-    env_cfg.rewards.pen_joint_powers.weight = 0.0  # 11
-    env_cfg.rewards.pen_base_height.weight = 0.0  # 12
-    env_cfg.rewards.pen_no_contact.weight = 0.0  # 13
-    env_cfg.rewards.pen_stan_still.weight = 0.0  # 14 
+    # env_cfg.rewards.rew_lin_vel_xy.weight = 0.0  # 1
+    # env_cfg.rewards.rew_ang_vel_z.weight = 0.0  # 2
+    # env_cfg.rewards.rew_no_fly.weight = 0.0  # 3
+    # env_cfg.rewards.pen_joint_deviation.weight = 0.0  # 4
+    
+    # env_cfg.rewards.pen_undesired_contacts.weight = 0.0  # 5
+    # env_cfg.rewards.pen_lin_vel_z.weight = 0.0  # 6
+    # env_cfg.rewards.pen_ang_vel_xy.weight = 0.0  # 7
+    # env_cfg.rewards.pen_action_rate.weight = 0.0  # 8
+    # env_cfg.rewards.pen_flat_orientation.weight = 0.0  # 9
 
-    agent_cfg: RslRlOnPolicyRunnerMlpCfg = cli_args.parse_rsl_rl_cfg(args_cli.task, args_cli)
-    if args_cli.seed is not None:
-        agent_cfg.seed = args_cli.seed
+    # env_cfg.rewards.pen_joint_accel.weight = 0.0  # 10
+    # env_cfg.rewards.pen_joint_powers.weight = 0.0  # 11
+    # env_cfg.rewards.pen_base_height.weight = 0.0  # 12
+    # env_cfg.rewards.pen_no_contact.weight = 0.0  # 13
+    # env_cfg.rewards.pen_stan_still.weight = 0.0  # 14 
+
+    # parse configuration: PointFootRunnerPPOCfg 
+    agent_cfg: RainbowRunnerCfg = cli_args.parse_rsl_rl_cfg(args_cli.task, args_cli)
 
     if args_cli.max_iterations is not None:
         agent_cfg.max_iterations = args_cli.max_iterations
-    if args_cli.save_interval is not None:
-        agent_cfg.save_interval = args_cli.save_interval
+    if args_cli.seed is not None:
+        agent_cfg.seed = args_cli.seed 
 
     # specify directory for logging experiments
     log_root_path = os.path.join("logs", "rsl_rl", agent_cfg.experiment_name)
     log_root_path = os.path.abspath(log_root_path)
+    # example path: /home/summer/Projects/biped_loco/bipedal_locomotion_isaaclab/logs/rsl_rl/pf_blind_flat
     print(f"[INFO] Logging experiment in directory: {log_root_path}")
     # specify directory for logging runs: {time-stamp}_{run_name}
+
     log_dir = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+
     if agent_cfg.run_name:
         log_dir += f"_{agent_cfg.run_name}"
-    log_dir = os.path.join(log_root_path, log_dir)
+    log_dir = os.path.join(log_root_path, agent_cfg.log_project_name, log_dir)
 
     # create isaac environment
     env = gym.make(args_cli.task, cfg=env_cfg, render_mode="rgb_array" if args_cli.video else None)
@@ -119,24 +120,25 @@ def main():
 
     # create runner from rsl-rl
     on_policy_runner_class = eval(agent_cfg.runner_type)
-    runner: OnPolicyRunner | OnPolicyRunnerMlp = on_policy_runner_class(
+    runner: RainbowRunner = on_policy_runner_class(
         env, agent_cfg.to_dict(), log_dir=log_dir, device=agent_cfg.device
     )
     # write git state to logs
     runner.add_git_repo_to_log(__file__)
     # save resume path before creating a new log_dir
-    if agent_cfg.resume:
-        # get path to previous checkpoint
-        if args_cli.checkpoint_path is not None:
-            resume_path = args_cli.checkpoint_path
-        else:
-            resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
-        print(f"[INFO]: Loading model checkpoint from: {resume_path}")
-        # load previously trained model
-        runner.load(resume_path)
+
+    # if agent_cfg.resume:
+    #     # get path to previous checkpoint
+    #     if args_cli.checkpoint_path is not None:
+    #         resume_path = args_cli.checkpoint_path
+    #     else:
+    #         resume_path = get_checkpoint_path(log_root_path, agent_cfg.load_run, agent_cfg.load_checkpoint)
+    #     print(f"[INFO]: Loading model checkpoint from: {resume_path}")
+    #     # load previously trained model
+    #     runner.load(resume_path)
 
     # set seed of the environment
-    env.seed(agent_cfg.seed)
+    # env.seed(agent_cfg.seed)
 
     # dump the configuration into log-directory
     dump_yaml(os.path.join(log_dir, "params", "env.yaml"), env_cfg)

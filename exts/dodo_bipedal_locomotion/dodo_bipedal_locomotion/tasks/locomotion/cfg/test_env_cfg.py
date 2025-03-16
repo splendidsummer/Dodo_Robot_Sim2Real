@@ -26,7 +26,7 @@ from dodo_bipedal_locomotion.tasks.locomotion import mdp
 
 
 @configclass
-class PFSceneCfg(InteractiveSceneCfg):
+class DodoSceneCfg(InteractiveSceneCfg):
     """Configuration for the test scene"""
 
     # terrain
@@ -76,6 +76,7 @@ class PFSceneCfg(InteractiveSceneCfg):
     height_scanner = None
 
     # contact sensors
+    # TODO: change the history_length, etc. according to the real robot later
     contact_forces = ContactSensorCfg(
         prim_path="{ENV_REGEX_NS}/Robot/.*", history_length=4, track_air_time=True, update_period=0.0
     )
@@ -382,11 +383,11 @@ class CurriculumCfg:
 
 
 @configclass
-class PFEnvCfg(ManagerBasedRLEnvCfg):
+class DodoEnvCfg(ManagerBasedRLEnvCfg):
     """Configuration for the test environment"""
 
     # Scene settings
-    scene: PFSceneCfg = PFSceneCfg(num_envs=4096, env_spacing=2.5)
+    scene: DodoSceneCfg = DodoSceneCfg(num_envs=4096, env_spacing=2.5)
     # Basic settings
     observations: ObservarionsCfg = ObservarionsCfg()
     actions: ActionsCfg = ActionsCfg()

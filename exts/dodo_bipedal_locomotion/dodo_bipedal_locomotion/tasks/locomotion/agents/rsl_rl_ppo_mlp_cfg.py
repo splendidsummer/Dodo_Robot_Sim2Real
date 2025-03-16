@@ -9,12 +9,13 @@ from dodo_bipedal_locomotion.utils.wrappers.rsl_rl import (
 
 
 @configclass
-class PFFlatPPORunnerMlpCfg(RslRlOnPolicyRunnerMlpCfg):
+class DodoPPORunnerMlpCfg(RslRlOnPolicyRunnerMlpCfg):
     runner_type = "OnPolicyRunnerMlp"
     num_steps_per_env = 24
     max_iterations = 3001
     save_interval = 200
     experiment_name = "pf_flat"
+    # TODO: To check whether the normalization parameters are correct
     empirical_normalization = False
     policy = RslRlPpoActorCriticCfg(
         class_name="ActorCritic",
@@ -47,9 +48,9 @@ class PFFlatPPORunnerMlpCfg(RslRlOnPolicyRunnerMlpCfg):
     )
 
 
-class PFRoughPPORunnerMlpCfg(PFFlatPPORunnerMlpCfg):
+class DodoRoughPPORunnerMlpCfg(DodoPPORunnerMlpCfg):
     def __post_init__(self):
         super().__post_init__()
 
-        self.experiment_name = "pf_rough"
+        self.experiment_name = "dodo_rough"
         self.runner_type = "OnPolicyRunnerMlp"
