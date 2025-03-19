@@ -155,7 +155,7 @@ This project is inspired by the work of [H. Wang, H. Luo, W. Zhang, and H. Chen 
 **Contributors:**
 - Shanshan Zhang
 - Dian Yu 
-- Zerui Wang
+- Zherui Wang
 - Jiahe Mao
-- ??? Yuan
+- Denghui Yuan
 
