@@ -145,3 +145,54 @@ def robot_base_pose(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntit
     asset: Articulation = env.scene[asset_cfg.name]
     device = torch.device("cuda") if torch.cuda.is_available() else torch.device("cpu")
     return asset.data.root_pos_w.to(device)
+
+
+def imu_orientation(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("imu")) -> torch.Tensor:
+    """Imu sensor orientation in the simulation world frame.
+
+    Args:
+        env: The environment.
+        asset_cfg: The SceneEntity associated with an IMU sensor. Defaults to SceneEntityCfg("imu").
+
+    Returns:
+        Orientation in the world frame in (w, x, y, z) quaternion form. Shape is (num_envs, 4).
+    """
+    # extract the used quantities (to enable type-hinting)
+    asset: Imu = env.scene[asset_cfg.name]
+    # return the orientation quaternion
+    return asset.data.quat_w
+
+
+
+def imu_ang_vel(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("imu")) -> torch.Tensor:
+    """Imu sensor angular velocity w.r.t. environment origin expressed in the sensor frame.
+
+    Args:
+        env: The environment.
+        asset_cfg: The SceneEntity associated with an IMU sensor. Defaults to SceneEntityCfg("imu").
+
+    Returns:
+        The angular velocity (rad/s) in the sensor frame. Shape is (num_envs, 3).
+    """
+    # extract the used quantities (to enable type-hinting)
+    asset: Imu = env.scene[asset_cfg.name]
+    # return the angular velocity
+    return asset.data.ang_vel_b
+
+
+
+def imu_lin_acc(env: ManagerBasedEnv, asset_cfg: SceneEntityCfg = SceneEntityCfg("imu")) -> torch.Tensor:
+    """Imu sensor linear acceleration w.r.t. the environment origin expressed in sensor frame.
+
+    Args:
+        env: The environment.
+        asset_cfg: The SceneEntity associated with an IMU sensor. Defaults to SceneEntityCfg("imu").
+
+    Returns:
+        The linear acceleration (m/s^2) in the sensor frame. Shape is (num_envs, 3).
+    """
+    asset: Imu = env.scene[asset_cfg.name]
+    return asset.data.lin_acc_b
+
+
+

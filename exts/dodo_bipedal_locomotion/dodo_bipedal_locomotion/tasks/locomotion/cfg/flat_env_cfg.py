@@ -33,6 +33,7 @@ from omni.isaac.lab.utils.assets import ISAAC_NUCLEUS_DIR, ISAACLAB_NUCLEUS_DIR
 from omni.isaac.lab.utils.noise import AdditiveGaussianNoiseCfg as GaussianNoise
 from omni.isaac.lab.utils.noise import AdditiveUniformNoiseCfg as UniformNoise
 from omni.isaac.lab_tasks.manager_based.locomotion.velocity.velocity_env_cfg import CommandsCfg as BaseCommandsCfg
+from omni.isaac.lab.isaaclab.sensors import ImuCfg 
 
 from dodo_bipedal_locomotion.tasks.locomotion import mdp
 
@@ -89,6 +90,12 @@ class PFSceneCfg(InteractiveSceneCfg):
     #     mesh_prim_paths=["/World/ground"],
     # )
     height_scanner = None
+    imu = ImuCfg(prim_path="{ENV_REGEX_NS}/Robot/base_link",  # TODO: check the prim_path when doing visualization
+                 update_period=0.0,
+                 history_length=4, 
+                 # TODO: add noise to the IMU sensor
+                 # TODO: add other settings for the IMU sensor           
+                 debug_vis=True) 
 
     # contact sensors
     contact_forces = ContactSensorCfg(
@@ -161,6 +168,21 @@ class ObservarionsCfg:
         # velocity command
         vel_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
 
+        # imu sensor related observation
+        imu_lin_acc = ObsTerm(func=mdp.observations.imu_lin_acc, 
+                              params={"asset_cfg": SceneEntityCfg("imu")}, 
+                              # To decide the noise level  
+                              noise=GaussianNoise(mean=0.0, std=0.01))
+        
+        imu_ang_vel = ObsTerm(func=mdp.observations.imu_ang_vel,
+                              params={"asset_cfg": SceneEntityCfg("imu")},
+                              # To decide the noise level
+                              noise=GaussianNoise(mean=0.0, std=0.01))
+        imu_orientation = ObsTerm(func=mdp.observations.imu_orientation, 
+                                  params={"asset_cfg": SceneEntityCfg("imu")},
+                                  # To decide the noise level
+                                  noise=GaussianNoise(mean=0.0, std=0.01))
+        
         # height measurement
         # heights = ObsTerm(func=mdp.height_scan,
         #                   params = {"sensor_cfg": SceneEntityCfg("height_scanner")},
@@ -216,6 +238,22 @@ class ObservarionsCfg:
         robot_vel = ObsTerm(func=mdp.robot_vel)
         robot_material_propertirs = ObsTerm(func=mdp.robot_material_properties)
         robot_base_pose = ObsTerm(func=mdp.robot_base_pose)
+        
+        # imu sensor related observation
+        # TODO: add measurements from the IMU sensor???
+        imu_lin_acc = ObsTerm(func=mdp.observations.imu_lin_acc, 
+                              params={"asset_cfg": SceneEntityCfg("imu")}, 
+                              # To decide the noise level  
+                              noise=GaussianNoise(mean=0.0, std=0.01))
+        
+        imu_ang_vel = ObsTerm(func=mdp.observations.imu_ang_vel,
+                              params={"asset_cfg": SceneEntityCfg("imu")},
+                              # To decide the noise level
+                              noise=GaussianNoise(mean=0.0, std=0.01))
+        imu_orientation = ObsTerm(func=mdp.observations.imu_orientation, 
+                                  params={"asset_cfg": SceneEntityCfg("imu")},
+                                  # To decide the noise level
+                                  noise=GaussianNoise(mean=0.0, std=0.01))
 
         def __post_init__(self):
             self.enable_corruption = True
