@@ -147,7 +147,7 @@ class ObservarionsCfg:
         """Observation for policy group"""
 
         # robot base measurements
-        # base_lin_vel = ObsTerm(func=mdp.base_lib_vel, noise=GaussianNoise(mean=0.0, std=0.05))
+        base_lin_vel = ObsTerm(func=mdp.base_lib_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=UniformNoise(operation="add", n_min=-0.2, n_max=0.2))
         proj_gravity = ObsTerm(func=mdp.projected_gravity, noise=UniformNoise(operation="add", n_min=-0.05, n_max=0.05))
 
@@ -168,8 +168,8 @@ class ObservarionsCfg:
         #                     )
 
         # gaits
-        gait_phase = ObsTerm(func=mdp.get_gait_phase)
-        gait_command = ObsTerm(func=mdp.get_gait_command, params={"command_name": "gait_command"})
+        # gait_phase = ObsTerm(func=mdp.get_gait_phase)
+        # gait_command = ObsTerm(func=mdp.get_gait_command, params={"command_name": "gait_command"})
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -243,17 +243,17 @@ class EventsCfg:
         is_global_time=False,
         min_step_count_between_reset=0,
     )
-    # add_link_mass = EventTerm(
-    #     func=mdp.randomize_rigid_body_mass,
-    #     mode="startup",
-    #     params={
-    #         "asset_cfg": SceneEntityCfg("robot", body_names=".*_[LR]_Link"),
-    #         "mass_distribution_params": (0.8, 1.2),
-    #         "operation": "scale",
-    #     },
-    #     is_global_time=False,
-    #     min_step_count_between_reset=0,
-    # )
+    add_link_mass = EventTerm(
+        func=mdp.randomize_rigid_body_mass,
+        mode="startup",
+        params={
+            "asset_cfg": SceneEntityCfg("robot", body_names=".*_[LR]_Link"),
+            "mass_distribution_params": (0.8, 1.2),
+            "operation": "scale",
+        },
+        is_global_time=False,
+        min_step_count_between_reset=0,
+    )
     radomize_rigid_body_mass_inertia = EventTerm(
         func=mdp.randomize_rigid_body_mass_inertia,
         mode="startup",
@@ -280,6 +280,7 @@ class EventsCfg:
         func=mdp.randomize_actuator_gains,
         mode="startup",
         params={
+            # setting the joint names to specify the joints to randomize
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
             "stiffness_distribution_params": (32, 48),
             "damping_distribution_params": (2.0, 3.0),
