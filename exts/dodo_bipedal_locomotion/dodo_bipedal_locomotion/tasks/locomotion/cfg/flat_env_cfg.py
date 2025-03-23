@@ -33,8 +33,6 @@ class CommandsCfg:
             lin_vel_x=(-1.0, 1.0), lin_vel_y=(-1.0, 1.0), ang_vel_z=(-1.0, 1.0), heading=(-math.pi, math.pi)
         ),
     )
-
-
 '''
 
 
@@ -191,7 +189,10 @@ class ObservarionsCfg:
 
         # robot base measurements
         # TODO: To clarify whether the observation terms is overlapped with the imu sensor obs terms. 
-        base_lin_vel = ObsTerm(func=mdp.base_lib_vel, noise=GaussianNoise(mean=0.0, std=0.05))
+        # TODO: check the noise type of UniformNoise and GaussianNoise!
+        # TODO: check the lin_vel ang_vel proj_gravity is the same value from robot base and imu sensor!!
+        # TODO: These value are overlapped with the IMU sensor measurements!! To decide which one to use later!
+        base_lin_vel = ObsTerm(func=mdp.base_lin_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=UniformNoise(operation="add", n_min=-0.2, n_max=0.2))
         proj_gravity = ObsTerm(func=mdp.projected_gravity, noise=UniformNoise(operation="add", n_min=-0.05, n_max=0.05))
 
@@ -207,19 +208,19 @@ class ObservarionsCfg:
 
         # imu sensor related observation
         # TODO: OVERLAPPED with the BASE measurements???
-        imu_lin_acc = ObsTerm(func=mdp.observations.imu_lin_acc, 
-                              params={"asset_cfg": SceneEntityCfg("imu")}, 
-                              # To decide the noise level  
-                              noise=GaussianNoise(mean=0.0, std=0.01))
+        # imu_lin_acc = ObsTerm(func=mdp.observations.imu_lin_acc, 
+        #                       params={"asset_cfg": SceneEntityCfg("imu")}, 
+        #                       # To decide the noise level  
+        #                       noise=GaussianNoise(mean=0.0, std=0.01))
         
-        imu_ang_vel = ObsTerm(func=mdp.observations.imu_ang_vel,
-                              params={"asset_cfg": SceneEntityCfg("imu")},
-                              # To decide the noise level
-                              noise=GaussianNoise(mean=0.0, std=0.01))
-        imu_orientation = ObsTerm(func=mdp.observations.imu_orientation, 
-                                  params={"asset_cfg": SceneEntityCfg("imu")},
-                                  # To decide the noise level
-                                  noise=GaussianNoise(mean=0.0, std=0.01))
+        # imu_ang_vel = ObsTerm(func=mdp.observations.imu_ang_vel,
+        #                       params={"asset_cfg": SceneEntityCfg("imu")},
+        #                       # To decide the noise level
+        #                       noise=GaussianNoise(mean=0.0, std=0.01))
+        # imu_orientation = ObsTerm(func=mdp.observations.imu_orientation, 
+        #                           params={"asset_cfg": SceneEntityCfg("imu")},
+        #                           # To decide the noise level
+        #                           noise=GaussianNoise(mean=0.0, std=0.01))
         
         # height measurement
         # heights = ObsTerm(func=mdp.height_scan,
@@ -244,9 +245,14 @@ class ObservarionsCfg:
         """Observation for critic group"""
 
         # Policy observation
-
+        base_lin_vel = ObsTerm(func=mdp.base_lin_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         proj_gravity = ObsTerm(func=mdp.projected_gravity, noise=GaussianNoise(mean=0.0, std=0.025))
+
+        imu_lin_acc = ObsTerm(func=mdp.observations.imu_lin_acc, 
+                params={"asset_cfg": SceneEntityCfg("imu")}, 
+                # To decide the noise level  
+                noise=GaussianNoise(mean=0.0, std=0.01))
 
         joint_pos = ObsTerm(func=mdp.joint_pos_rel, noise=GaussianNoise(mean=0.0, std=0.01))
         joint_vel = ObsTerm(func=mdp.joint_vel, noise=GaussianNoise(mean=0.0, std=0.01))
@@ -563,9 +569,11 @@ class FlatEnvCfg(ManagerBasedRLEnvCfg):
     def __post_init__(self):
         """Post initialization"""
         self.decimation = 4
+        # TODO: To recheck the episode length for the environment 
         self.episode_length_s = 20.0
         self.sim.render_interval = 2 * self.decimation
         # simulation settings
+        # TODO: check the simulation update period 
         self.sim.dt = 0.005
         self.seed = 42
         # update sensor update periods
