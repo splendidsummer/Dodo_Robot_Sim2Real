@@ -1,6 +1,6 @@
 """
 The runner is designed to be used with flat terrain environments.
-DodoPPORunnerMlpCfg is called in the script rsl_rl/train.py for flat terrain environments.
+DodoPPORunnerMlpCfg is called in the script rsl_rl/train.py for flat terrain env.
 DodoRoughPPORunnerMlpCfg is currently not used in the codebase.
 """
 

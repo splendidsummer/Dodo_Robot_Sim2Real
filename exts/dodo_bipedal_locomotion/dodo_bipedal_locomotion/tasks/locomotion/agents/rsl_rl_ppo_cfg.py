@@ -1,11 +1,14 @@
+"""
+The runner is designed to be used with rough terrain environments.
+DodoPPORunnerCfg is called in the script rsl_rl/train.py for rough terrain env.
+"""
+
 from omni.isaac.lab.utils import configclass
 from omni.isaac.lab_tasks.utils.wrappers.rsl_rl import (
     RslRlOnPolicyRunnerCfg,
     RslRlPpoActorCriticCfg,
     RslRlPpoAlgorithmCfg,
 )
-
-
 
 
 @configclass
