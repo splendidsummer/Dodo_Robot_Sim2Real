@@ -64,7 +64,7 @@ To setup the VSCODE, please follow these instructions:
 ```bash
 python scripts/rsl_rl/train.py --task=Isaac-PF-Blind-Flat-v0 --headless
 ```
-
+4
 - It is recommend to use `start.sh` script to train the robot, specifying the task in the script:
 
 ```bash

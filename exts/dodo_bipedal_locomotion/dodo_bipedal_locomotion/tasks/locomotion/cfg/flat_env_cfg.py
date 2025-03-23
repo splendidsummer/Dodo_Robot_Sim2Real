@@ -512,12 +512,24 @@ class TerminationsCfg:
 
     time_out = DoneTerm(func=mdp.time_out, time_out=True)
     base_contact = DoneTerm(
+        # illegal contact force for base link
         func=mdp.illegal_contact,
         params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names="base_link"), "threshold": 1.0},
     ) 
-    # TODO: Adding more termination terms for the robot body parts 
-    #       1. term one: height restriction for the robot base
-    #      2. term two: joint position limits for the robot joints?? 
+    
+    # TODO: root_link_pos_w[:, 2] < minimum_height 
+    # TODO: To update the base height from CAD file 
+    base_height_low = DoneTerm(func=mdp.root_height_below_minimum, 
+                            params={"minimum_height": 0.2, 
+                                    # TODO: check do we need body names for the base link?
+                                    "sensor_cfg": SceneEntityCfg("robot"),
+                            })
+
+    base_height_high = DoneTerm(func=mdp.root_height_above_maximum, 
+                        params={"maximum_height": 0.6, 
+                                # TODO: check do we need body names for the base link?  
+                                "sensor_cfg": SceneEntityCfg("robot"),
+                        })
 
 
 @configclass
