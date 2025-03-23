@@ -1,6 +1,11 @@
 '''
 Customized robot body for the environment from TUM MIRMI Dodo-Alive Lab
 our modification include 
+Note: 
+    1. The joint names before modification are: 
+        joint_names = [ "abad_L_Joint", "abad_R_Joint", "hip_L_Joint", "hip_R_Joint", "knee_L_Joint", "knee_R_Joint", "foot_L_Joint", "foot_R_Joint"]
+    2. The  link names after modification are:
+        link_names = ["base_Link", "abad_L_Link", "abad_R_Link", "hip_L_Link", "hip_R_Link", "knee_L_Link", "knee_R_Link", "foot_L_Link", "foot_R_Link"]
 
 links = [ "base_link", "Left_HIP", "Left_THIGH", "Left_SHIN",
         "Left_FOOT_FE", "Right_HIP", "Right_THIGH", "Right_SHIN",
@@ -9,6 +14,27 @@ links = [ "base_link", "Left_HIP", "Left_THIGH", "Left_SHIN",
 joints = [ "Left_HIP_AA", "Left_THIGH_FE", "Left_KNEE_FE", "Left_FOOT_ANKLE",
         "Right_HIP_AA", "Right_THIGH_FE", "Right_SHIN_FE",
         "Right_FOOT_ANKLE"]
+
+# CommandCfg copy from IsaacLab velocity_env_cfg.py
+
+@configclass
+class CommandsCfg:
+    """Command specifications for the MDP."""
+
+    base_velocity = mdp.UniformVelocityCommandCfg(
+        asset_name="robot",
+        resampling_time_range=(10.0, 10.0),
+        rel_standing_envs=0.02,
+        rel_heading_envs=1.0,
+        heading_command=True,
+        heading_control_stiffness=0.5,
+        debug_vis=True,
+        ranges=mdp.UniformVelocityCommandCfg.Ranges(
+            lin_vel_x=(-1.0, 1.0), lin_vel_y=(-1.0, 1.0), ang_vel_z=(-1.0, 1.0), heading=(-math.pi, math.pi)
+        ),
+    )
+
+
 '''
 
 
@@ -53,6 +79,7 @@ class PFSceneCfg(InteractiveSceneCfg):
         max_init_terrain_level=0,
         collision_group=-1,
         physics_material=RigidBodyMaterialCfg(
+            # TODO: check the physics material properties for the terrain!
             friction_combine_mode="multiply",
             restitution_combine_mode="multiply",
             static_friction=1.0,
@@ -65,6 +92,7 @@ class PFSceneCfg(InteractiveSceneCfg):
             project_uvw=True,
             texture_scale=(0.25, 0.25),
         ),
+        # TODO: check what does the debug_vis do? 
         debug_vis=False,
     )
 
@@ -91,9 +119,11 @@ class PFSceneCfg(InteractiveSceneCfg):
     # )
     height_scanner = None
     imu = ImuCfg(prim_path="{ENV_REGEX_NS}/Robot/base_link",  # TODO: check the prim_path when doing visualization
+                 # TODO: check the update period for the IMU sensor
                  update_period=0.0,
+                 # TODO: check the history length for the IMU sensor
                  history_length=4, 
-                 # TODO: add noise to the IMU sensor
+                 # TODO: add noise to the IMU sensor, I think it is not necessary here since ObservationTermCfg has noise
                  # TODO: add other settings for the IMU sensor           
                  debug_vis=True) 
 
@@ -110,24 +140,30 @@ class PFSceneCfg(InteractiveSceneCfg):
 
 @configclass
 class CommandCfg(BaseCommandsCfg):
-    gait_command = mdp.UniformGaitCommandCfg(
-        resampling_time_range=(5.0, 5.0),  # Fixed resampling time of 5 seconds
-        debug_vis=False,  # No debug visualization needed
-        ranges=mdp.UniformGaitCommandCfg.Ranges(
-            frequencies=(1.5, 2.5),  # Gait frequency range [Hz]
-            offsets=(0.5, 0.5),  # Phase offset range [0-1]
-            durations=(0.5, 0.5),  # Contact duration range [0-1]
-        ),
-    )
+    # gait_command = mdp.UniformGaitCommandCfg(
+    #     resampling_time_range=(5.0, 5.0),  # Fixed resampling time of 5 seconds
+    #     debug_vis=False,  # No debug visualization needed
+    #     ranges=mdp.UniformGaitCommandCfg.Ranges(
+    #         frequencies=(1.5, 2.5),  # Gait frequency range [Hz]
+    #         offsets=(0.5, 0.5),  # Phase offset range [0-1]
+    #         durations=(0.5, 0.5),  # Contact duration range [0-1]
+    #     ),
+    # )
 
     def __post_init__(self):
+        # TDOO: figure out asset_name ? 
         self.base_velocity.asset_name = "robot"
+        # TODO: check what is the heading command?
         self.base_velocity.heading_command = True
         self.base_velocity.debug_vis = True
+        # TODO: check what is the heading control stiffness
         self.base_velocity.heading_control_stiffness = 1.0
+        # TODO: check the resampling time range if feasible? 
         self.base_velocity.resampling_time_range = (0.0, 5.0)
+        # TODO: check the relative standing envs and heading envs
         self.base_velocity.rel_standing_envs = 0.2
         self.base_velocity.rel_heading_envs = 0.0
+        # TODO: check the ranges for the base velocity 
         self.base_velocity.ranges = mdp.UniformVelocityCommandCfg.Ranges(
             lin_vel_x=(-1.0, 1.0), lin_vel_y=(-0.5, 0.5), ang_vel_z=(-1, 1), heading=(-math.pi, math.pi)
         )
@@ -154,6 +190,7 @@ class ObservarionsCfg:
         """Observation for policy group"""
 
         # robot base measurements
+        # TODO: To clarify whether the observation terms is overlapped with the imu sensor obs terms. 
         base_lin_vel = ObsTerm(func=mdp.base_lib_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=UniformNoise(operation="add", n_min=-0.2, n_max=0.2))
         proj_gravity = ObsTerm(func=mdp.projected_gravity, noise=UniformNoise(operation="add", n_min=-0.05, n_max=0.05))
@@ -169,6 +206,7 @@ class ObservarionsCfg:
         vel_command = ObsTerm(func=mdp.generated_commands, params={"command_name": "base_velocity"})
 
         # imu sensor related observation
+        # TODO: OVERLAPPED with the BASE measurements???
         imu_lin_acc = ObsTerm(func=mdp.observations.imu_lin_acc, 
                               params={"asset_cfg": SceneEntityCfg("imu")}, 
                               # To decide the noise level  
@@ -196,7 +234,9 @@ class ObservarionsCfg:
         def __post_init__(self):
             self.enable_corruption = True
             self.concatenate_terms = True
+            # TODO: check the history length for the observation terms 
             self.history_length = 5
+            # TODO: check the flatten history dim for the observation terms
             self.flatten_history_dim = True
 
     @configclass
@@ -219,6 +259,7 @@ class ObservarionsCfg:
         gait_command = ObsTerm(func=mdp.get_gait_command, params={"command_name": "gait_command"})
 
         # Privileged observation
+        # TODO: check the privileged observation terms and why?
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
         robot_joint_torque = ObsTerm(func=mdp.robot_joint_torque)
         robot_joint_acc = ObsTerm(func=mdp.robot_joint_acc)
@@ -258,7 +299,9 @@ class ObservarionsCfg:
         def __post_init__(self):
             self.enable_corruption = True
             self.concatenate_terms = True
+            # TODO: check the history length for the observation terms
             self.history_length = 5
+            # TODO: check the flatten history dim for the observation terms
             self.flatten_history_dim = True
 
     policy: PolicyCfg = PolicyCfg()
@@ -275,6 +318,7 @@ class EventsCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names="base_link"),
+            # TODO: modify the mass distribution parameters 
             "mass_distribution_params": (-1.0, 3.0),
             "operation": "add",
         },
@@ -282,10 +326,12 @@ class EventsCfg:
         min_step_count_between_reset=0,
     )
     add_link_mass = EventTerm(
+        # TODO: assuming the base link is not included here but assigned in center of mass 
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
-            "asset_cfg": SceneEntityCfg("robot", body_names=".*_[LR]_Link"),
+            # TODO: Confirm not including the base link and imu sensor here!
+            "asset_cfg": SceneEntityCfg("robot", body_names="^(?!base_link$).+$"),
             "mass_distribution_params": (0.8, 1.2),
             "operation": "scale",
         },
@@ -297,6 +343,7 @@ class EventsCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot"),
+            # TODO: check the mass inertia distribution parameters in real time
             "mass_inertia_distribution_params": (0.8, 1.2),
             "operation": "scale",
         },
@@ -306,6 +353,7 @@ class EventsCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names=".*"),
+            # TODO: modify the physics material properties for the robot
             "static_friction_range": (0.4, 1.2),
             "dynamic_friction_range": (0.7, 0.9),
             "restitution_range": (0.0, 1.0),
@@ -320,6 +368,7 @@ class EventsCfg:
         params={
             # setting the joint names to specify the joints to randomize
             "asset_cfg": SceneEntityCfg("robot", joint_names=".*"),
+            # TODO: modify the stiffness and damping distribution parameters
             "stiffness_distribution_params": (32, 48),
             "damping_distribution_params": (2.0, 3.0),
             "operation": "abs",
@@ -333,6 +382,7 @@ class EventsCfg:
         mode="startup",
         params={
             "asset_cfg": SceneEntityCfg("robot"),
+            # TODO: modify the center of mass distribution parameters
             "com_distribution_params": ((-0.075, 0.075), (-0.05, 0.06), (-0.05, 0.05)),
             "operation": "add",
             "distribution": "uniform",
@@ -344,6 +394,7 @@ class EventsCfg:
         func=mdp.reset_root_state_uniform,
         mode="reset",
         params={
+            # TODO: modify the pose range for the robot base
             "pose_range": {"x": (-0.5, 0.5), "y": (-0.5, 0.5), "yaw": (-3.14, 3.14)},
             "velocity_range": {
                 "x": (-0.5, 0.5),
@@ -376,6 +427,7 @@ class EventsCfg:
         interval_range_s=(0.0, 0.0),
         params={
             "asset_cfg": SceneEntityCfg("robot", body_names="base_link"),
+            # TODO: modify the force and torque range for the robot
             "force_range": {
                 "x": (-500.0, 500.0),
                 "y": (-500.0, 500.0),
@@ -410,14 +462,15 @@ class RewardsCfg:
     )
 
     # penalizations
-    # pen_undesired_contacts = RewTerm(
-    #     func=mdp.undesired_contacts,
-    #     weight=-0.5,
-    #     params={
-    #         "sensor_cfg": SceneEntityCfg("contact_forces", body_names=["abad_.*", "hip_.*", "knee_.*", "base_link"]),
-    #         "threshold": 10.0,
-    #     },
-    # )
+    pen_undesired_contacts = RewTerm(
+        func=mdp.undesired_contacts,
+        weight=-0.5,
+        params={
+            "sensor_cfg": SceneEntityCfg("contact_forces",
+                                          body_names=[".*_HIP", ".*_THIGH", ".*_SHIN", "base_link"]), 
+            "threshold": 10.0,
+        },
+    )
     pen_lin_vel_z = RewTerm(func=mdp.lin_vel_z_l2, weight=-0.5)
     pen_ang_vel_xy = RewTerm(func=mdp.ang_vel_xy_l2, weight=-0.05)
     pen_action_rate = RewTerm(func=mdp.action_rate_l2, weight=-0.01)
@@ -461,7 +514,10 @@ class TerminationsCfg:
     base_contact = DoneTerm(
         func=mdp.illegal_contact,
         params={"sensor_cfg": SceneEntityCfg("contact_forces", body_names="base_link"), "threshold": 1.0},
-    )
+    ) 
+    # TODO: Adding more termination terms for the robot body parts 
+    #       1. term one: height restriction for the robot base
+    #      2. term two: joint position limits for the robot joints?? 
 
 
 @configclass

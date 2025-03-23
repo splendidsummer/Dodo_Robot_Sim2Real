@@ -82,6 +82,8 @@ class PFSceneCfg(InteractiveSceneCfg):
         prim_path="{ENV_REGEX_NS}/Robot/.*", history_length=4, track_air_time=True, update_period=0.0
     )
 
+    # TODO: Add imu sensors here
+
 
 ##############
 # MDP settings
@@ -119,7 +121,11 @@ class ActionsCfg:
 
     joint_pos = mdp.JointPositionActionCfg(
         asset_name="robot",
-        joint_names=["abad_L_Joint", "abad_R_Joint", "hip_L_Joint", "hip_R_Joint", "knee_L_Joint", "knee_R_Joint"],
+        joint_names=["Left_HIP_AA", "Left_THIGH_FE", "Left_KNEE_FE",
+                     "Left_FOOT_ANKLE", "Right_HIP_AA", "Right_THIGH_FE",
+                     "Right_SHIN_FE", "Right_FOOT_ANKLE"], 
+        # TODO: Why are we using the scale of 0.25? Go2 & H1 = 0.5
+        # TODO: check if we need to use the default offset 
         scale=0.25,
         use_default_offset=True,
     )
@@ -134,7 +140,7 @@ class TestObservarionsCfg:
         """Observation for policy group"""
 
         # robot base measurements
-        # base_lin_vel = ObsTerm(func=mdp.base_lib_vel, noise=GaussianNoise(mean=0.0, std=0.05))
+        base_lin_vel = ObsTerm(func=mdp.base_lib_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=UniformNoise(operation="add", n_min=-0.2, n_max=0.2))
         proj_gravity = ObsTerm(func=mdp.projected_gravity, noise=UniformNoise(operation="add", n_min=-0.05, n_max=0.05))
 
@@ -154,9 +160,24 @@ class TestObservarionsCfg:
         #                             noise=GaussianNoise(mean=0.0, std=0.01),
         #                     )
 
+        # TODO: OVERLAPPED with the BASE measurements???
+        # imu_lin_acc = ObsTerm(func=mdp.observations.imu_lin_acc, 
+        #                       params={"asset_cfg": SceneEntityCfg("imu")}, 
+        #                       # To decide the noise level  
+        #                       noise=GaussianNoise(mean=0.0, std=0.01))
+        
+        # imu_ang_vel = ObsTerm(func=mdp.observations.imu_ang_vel,
+        #                       params={"asset_cfg": SceneEntityCfg("imu")},
+        #                       # To decide the noise level
+        #                       noise=GaussianNoise(mean=0.0, std=0.01))
+        # imu_orientation = ObsTerm(func=mdp.observations.imu_orientation, 
+        #                           params={"asset_cfg": SceneEntityCfg("imu")},
+        #                           # To decide the noise level
+        #                           noise=GaussianNoise(mean=0.0, std=0.01))
+
         # gaits
-        gait_phase = ObsTerm(func=mdp.get_gait_phase)
-        gait_command = ObsTerm(func=mdp.get_gait_command, params={"command_name": "gait_command"})
+        # gait_phase = ObsTerm(func=mdp.get_gait_phase)
+        # gait_command = ObsTerm(func=mdp.get_gait_command, params={"command_name": "gait_command"})
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -167,8 +188,6 @@ class TestObservarionsCfg:
     @configclass
     class CriticCfg(ObsGroup):
         """Observation for critic group"""
-
-        # Policy observation
 
         base_ang_vel = ObsTerm(func=mdp.base_ang_vel, noise=GaussianNoise(mean=0.0, std=0.05))
         proj_gravity = ObsTerm(func=mdp.projected_gravity, noise=GaussianNoise(mean=0.0, std=0.025))
@@ -184,6 +203,7 @@ class TestObservarionsCfg:
         gait_command = ObsTerm(func=mdp.get_gait_command, params={"command_name": "gait_command"})
 
         # Privileged observation
+        # TODO: check the privileged observation terms and why?
         base_lin_vel = ObsTerm(func=mdp.base_lin_vel)
         robot_joint_torque = ObsTerm(func=mdp.robot_joint_torque)
         robot_joint_acc = ObsTerm(func=mdp.robot_joint_acc)
@@ -202,6 +222,22 @@ class TestObservarionsCfg:
         robot_vel = ObsTerm(func=mdp.robot_vel)
         robot_material_propertirs = ObsTerm(func=mdp.robot_material_properties)
         robot_base_pose = ObsTerm(func=mdp.robot_base_pose)
+
+        # imu sensor related observation
+        # TODO: add measurements from the IMU sensor???
+        imu_lin_acc = ObsTerm(func=mdp.observations.imu_lin_acc, 
+                              params={"asset_cfg": SceneEntityCfg("imu")}, 
+                              # To decide the noise level  
+                              noise=GaussianNoise(mean=0.0, std=0.01))
+        
+        imu_ang_vel = ObsTerm(func=mdp.observations.imu_ang_vel,
+                              params={"asset_cfg": SceneEntityCfg("imu")},
+                              # To decide the noise level
+                              noise=GaussianNoise(mean=0.0, std=0.01))
+        imu_orientation = ObsTerm(func=mdp.observations.imu_orientation, 
+                                  params={"asset_cfg": SceneEntityCfg("imu")},
+                                  # To decide the noise level
+                                  noise=GaussianNoise(mean=0.0, std=0.01))
 
         def __post_init__(self):
             self.enable_corruption = True
@@ -222,7 +258,7 @@ class EventsCfg:
         func=mdp.randomize_rigid_body_mass,
         mode="startup",
         params={
-            "asset_cfg": SceneEntityCfg("robot", body_names="base_Link"),
+            "asset_cfg": SceneEntityCfg("robot", body_names="base_link"),
             "mass_distribution_params": (-1.0, 3.0),
             "operation": "add",
         },
