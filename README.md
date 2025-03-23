@@ -64,7 +64,7 @@ To setup the VSCODE, please follow these instructions:
 ```bash
 python scripts/rsl_rl/train.py --task=Isaac-PF-Blind-Flat-v0 --headless
 ```
-4
+4nb667r=6790uy8-
 - It is recommend to use `start.sh` script to train the robot, specifying the task in the script:
 
 ```bash
@@ -158,4 +158,26 @@ This project is inspired by the work of [H. Wang, H. Luo, W. Zhang, and H. Chen 
 - Zherui Wang
 - Jiahe Mao
 - Denghui Yuan
+
+## References
+
+- [Author(s), "Title of the Paper," Journal/Conference, Year.](URL)
+
+
+## How to cite us 
+
+@article{kumar2021rma,
+  title={RMA: Rapid Motor Adaptation for Legged Robots},
+  author={Kumar, Ashish and Fu, Zipeng and Pathak, Deepak and Malik, Jitendra},
+  journal={arXiv preprint arXiv:2107.04034},
+  year={2021}
+}
+
+@article{kumar2021rma,
+  title={Rma: Rapid motor adaptation for legged robots},
+  author={Kumar, Ashish and Fu, Zipeng and Pathak, Deepak and Malik, Jitendra},
+  journal={arXiv preprint arXiv:2107.04034},
+  year={2021}
+}
+
 

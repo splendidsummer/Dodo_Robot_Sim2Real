@@ -72,9 +72,11 @@ class DodoBaseEnvCfg_PLAY(DodoBaseEnvCfg):
         self.events.add_base_mass = None
 
 
-############################################
+###########################################################
 # Dodo Robot Blind Flat Environment
-############################################ 
+# This is commented out in the original code
+# since Flat Environment in use is in dodo_mlp_env_cfg.py
+########################################################### 
 # @configclass
 # class DodoBlindFlatEnvCfg(DodoBaseEnvCfg):
 #     def __post_init__(self):

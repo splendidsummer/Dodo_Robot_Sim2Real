@@ -1,3 +1,9 @@
+"""
+The runner is designed to be used with flat terrain environments.
+DodoPPORunnerMlpCfg is called in the script rsl_rl/train.py for flat terrain environments.
+DodoRoughPPORunnerMlpCfg is currently not used in the codebase.
+"""
+
 from omni.isaac.lab.utils import configclass
 
 from dodo_bipedal_locomotion.utils.wrappers.rsl_rl import (
