@@ -161,23 +161,8 @@ This project is inspired by the work of [H. Wang, H. Luo, W. Zhang, and H. Chen 
 
 ## References
 
-- [Author(s), "Title of the Paper," Journal/Conference, Year.](URL)
-
-
-## How to cite us 
-
-@article{kumar2021rma,
-  title={RMA: Rapid Motor Adaptation for Legged Robots},
-  author={Kumar, Ashish and Fu, Zipeng and Pathak, Deepak and Malik, Jitendra},
-  journal={arXiv preprint arXiv:2107.04034},
-  year={2021}
-}
-
-@article{kumar2021rma,
-  title={Rma: Rapid motor adaptation for legged robots},
-  author={Kumar, Ashish and Fu, Zipeng and Pathak, Deepak and Malik, Jitendra},
-  journal={arXiv preprint arXiv:2107.04034},
-  year={2021}
-}
-
-
+- Kumar, Ashish; Fu, Zipeng; Pathak, Deepak; Malik, Jitendra, "RMA: Rapid Motor Adaptation for Legged Robots," 
+Robotics: Science and Systems, 2021.
+- Margolis, Gabriel B.; Agrawal, Pulkit, "Walk These Ways: Tuning Robot Control for Generalization with Multiplicity of Behavior," Conference on Robot Learning, 2023.
+  
+- Wang, Hao; Luo, Hao; Zhang, Wei; Chen, Hao, "CTS: Concurrent Teacher-Student Reinforcement Learning for Legged Locomotion," IEEE Robotics and Automation Letters, 2024.
