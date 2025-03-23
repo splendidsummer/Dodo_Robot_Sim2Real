@@ -20,9 +20,24 @@ parser.add_argument("--save_interval", type=int, default=None, help="The number 
 parser.add_argument("--task", type=str, default=None, help="Name of the task.")
 parser.add_argument("--seed", type=int, default=None, help="Seed used for the environment")
 parser.add_argument("--checkpoint_path", type=str, default=None, help="Relative path to checkpoint file.")
+# -- RL Library arguments  
+parser.add_argument_group("rsl_rl", description="Arguments for RSL-RL agent.")
+# -- experiment arguments
+parser.add_argument("--experiment_name", type=str, default=None,
+                     help="Name of the experiment folder where logs will be stored.")
+parser.add_argument("--run_name", type=str, default=None, help="Run name suffix to the log directory.")
+# -- load arguments
+parser.add_argument("--resume", type=bool, default=None, help="Whether to resume from a checkpoint.")
+parser.add_argument("--load_run", type=str, default=None, help="Name of the run folder to resume from.")
+parser.add_argument("--checkpoint", type=str, default=None, help="Checkpoint file to resume from.")
+# -- logger arguments
+parser.add_argument(
+        "--logger", type=str, default=None, choices={"wandb", "tensorboard", "neptune"}, help="Logger module to use.")
+parser.add_argument(
+        "--log_project_name", type=str, default=None, help="Name of the logging project when using wandb or neptune.")
 
 # append RSL-RL cli arguments
-cli_args.add_rsl_rl_args(parser)
+# cli_args.add_rsl_rl_args(parser)
 # append AppLauncher cli args
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
@@ -51,8 +66,10 @@ from rsl_rl.runners import OnPolicyRunner, OnPolicyRunnerMlp
 
 torch.backends.cuda.matmul.allow_tf32 = True
 torch.backends.cudnn.allow_tf32 = True
-torch.backends.cudnn.deterministic = False
-torch.backends.cudnn.benchmark = False
+# torch.backends.cudnn.deterministic = False
+# torch.backends.cudnn.benchmark = False
+torch.backends.cudnn.deterministic = True
+torch.backends.cudnn.benchmark = True
 
 
 def main():

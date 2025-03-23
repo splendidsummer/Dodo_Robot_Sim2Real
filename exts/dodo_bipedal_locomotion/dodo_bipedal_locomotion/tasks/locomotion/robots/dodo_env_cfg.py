@@ -1,3 +1,19 @@
+"""
+Dodo Robot Environment Configurations:  
+    1. for Rough Terrain and Stairs Environments 
+    2. The different configurations for Rough Scene:
+        - self.rewards.pen_flat_orientation = None
+        - self.scene.terrain.terrain_type = "generator" 
+        - self.scene.terrain.terrain_generator = BLIND_ROUGH_TERRAINS_CFG 
+    3. The different configurations for Play Environment:
+        - self.scene.terrain.max_init_terrain_level = None
+    4. The different configurations from Play Environment:        
+        1. self.scene.num_envs = 32
+        2. self.observations.policy.enable_corruption = False
+        3. self.events.push_robot = None
+        4. self.events.add_base_mass = None    
+"""
+
 import math
 
 from omni.isaac.lab.utils import configclass
@@ -12,11 +28,10 @@ from dodo_bipedal_locomotion.tasks.locomotion.cfg.test_terrains_cfg import (
     STAIRS_TERRAINS_PLAY_CFG,
 )
 
+
 #####################################
 # Dodo Robot Base Environment
 #####################################
-
-
 @configclass
 class DodoBaseEnvCfg(DodoEnvCfg):
     def __post_init__(self):
@@ -34,6 +49,7 @@ class DodoBaseEnvCfg(DodoEnvCfg):
             "Right_FOOT_ANKLE": 0.0,
         }
 
+        # TODO: add base mass randomization only for base_link??
         self.events.add_base_mass.params["asset_cfg"].body_names = "base_link"
         self.events.add_base_mass.params["mass_distribution_params"] = (-1.0, 2.0)
 
@@ -59,31 +75,26 @@ class DodoBaseEnvCfg_PLAY(DodoBaseEnvCfg):
 ############################################
 # Dodo Robot Blind Flat Environment
 ############################################ 
+# @configclass
+# class DodoBlindFlatEnvCfg(DodoBaseEnvCfg):
+#     def __post_init__(self):
+#         super().__post_init__()
+#
+#         # self.rewards.pen_flat_orientation = None
+#
+#         self.curriculum.terrain_levels = None
+
+# @configclass
+# class DodoBlindFlatEnvCfg_PLAY(DodoBaseEnvCfg_PLAY):
+#     def __post_init__(self):
+#         super().__post_init__()
+#
+#         self.curriculum.terrain_levels = None
 
 
-@configclass
-class DodoBlindFlatEnvCfg(DodoBaseEnvCfg):
-    def __post_init__(self):
-        super().__post_init__()
-
-        # self.rewards.pen_flat_orientation = None
-
-        self.curriculum.terrain_levels = None
-
-
-@configclass
-class DodoBlindFlatEnvCfg_PLAY(DodoBaseEnvCfg_PLAY):
-    def __post_init__(self):
-        super().__post_init__()
-
-        self.curriculum.terrain_levels = None
-
-
-####################################################
+#############################################
 # Dodo Robot Blind Rough Environment
-#################################################### 
-
-
+############################################# 
 @configclass
 class DodoBlindRoughEnvCfg(DodoBaseEnvCfg):
     def __post_init__(self):
@@ -112,8 +123,6 @@ class DodoBlindRoughEnvCfg_PLAY(DodoBaseEnvCfg_PLAY):
 ############################################
 # Dodo Robot Blind Stairs Environment
 ############################################
-
-
 @configclass
 class DodoBlindStairsEnvCfg(DodoBaseEnvCfg):
     def __post_init__(self):
