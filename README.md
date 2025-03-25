@@ -132,16 +132,12 @@ https://github.com/user-attachments/assets/74074571-f327-42d0-a424-7df8d9e96653
 ## Troubleshooting
 
 ### Problem 1
+***Make modification in order to adapt the robot state of System Management in ROS architecture.***
 
 
-### Problem 2
+### Problems to Be Solved
 
 
-```json
-# code example lines 
-"<path-to-isaac-sim>/extscache/omni.anim.*"         // Animation packages
-...
-```
 
 ## Acknowledgements
 
